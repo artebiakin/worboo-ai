@@ -74,7 +74,7 @@ export function LoginView() {
 								<Label>Remember me</Label>
 							</CheckboxField>
 							<TSRLink
-								to="/"
+								to="/forgot-password"
 								className="text-sm text-zinc-600 underline decoration-zinc-950/30 hover:decoration-zinc-950 dark:text-zinc-400 dark:decoration-white/30 dark:hover:decoration-white"
 							>
 								Forgot password?
