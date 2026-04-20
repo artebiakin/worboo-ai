@@ -11,9 +11,6 @@ export default function Header() {
 					aria-label="Worboo home"
 					className="group inline-flex items-center gap-2"
 				>
-					<span className="grid h-8 w-8 place-items-center rounded-lg bg-linear-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white shadow-sm transition-transform group-hover:-rotate-6 group-hover:scale-110 group-active:scale-95 motion-reduce:transition-none motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100 motion-reduce:group-active:scale-100">
-						W
-					</span>
 					<span className="font-display text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
 						Worboo
 					</span>
