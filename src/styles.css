@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Space+Grotesk:wght@400..700&display=swap');
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-dm-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-space-grotesk: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-space-grotesk);
+}
+
+@layer base {
+  body {
+    @apply bg-white font-sans text-zinc-950 antialiased dark:bg-zinc-950 dark:text-white;
+  }
+}
+
+@layer utilities {
+  /* Decorative sunset gradient used on the marketing hero. */
+  .bg-hero-gradient {
+    background-image: radial-gradient(
+      125% 125% at 50% 101%,
+      rgba(255, 89, 0, 0.2) 10.5%,
+      rgba(255, 123, 0, 0.2) 16%,
+      rgba(245, 140, 2, 0.2) 17.5%,
+      rgba(245, 170, 100, 0.2) 25%,
+      rgba(238, 174, 202, 0.2) 40%,
+      rgba(202, 179, 214, 0.2) 65%,
+      rgba(148, 201, 233, 0.2) 100%
+    );
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "tsc: type-check",
+      "type": "shell",
+      "command": "npx tsc --noEmit --pretty false | grep -v '^node_modules/' || true",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "tsc: watch",
+      "type": "shell",
+      "command": "npx tsc --noEmit --watch --pretty false | grep --line-buffered -v '^node_modules/'",
+      "isBackground": true,
+      "problemMatcher": ["$tsc-watch"],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "biome: check",
+      "type": "shell",
+      "command": "npm run check",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    }
+  ]
+}
