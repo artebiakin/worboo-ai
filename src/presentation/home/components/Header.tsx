@@ -13,7 +13,7 @@ export default function Header() {
 				<Button plain href="/login">
 					Log in
 				</Button>
-				<Button color="violet" href="/">
+				<Button color="violet" href="/signup">
 					Get started
 				</Button>
 			</div>

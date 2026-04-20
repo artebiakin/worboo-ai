@@ -9,19 +9,21 @@ import { Heading } from "#/presentation/components/catalyst/heading";
 import { Input } from "#/presentation/components/catalyst/input";
 import { Text } from "#/presentation/components/catalyst/text";
 import Logo from "#/presentation/components/Logo";
-import { useLogin } from "./hooks";
+import { useSignup } from "./hooks";
 
-export function LoginView() {
+export function SignupView() {
 	const {
+		name,
+		setName,
 		email,
 		setEmail,
 		password,
 		setPassword,
-		remember,
-		setRemember,
+		acceptTerms,
+		setAcceptTerms,
 		canSubmit,
 		handleSubmit,
-	} = useLogin();
+	} = useSignup();
 
 	return (
 		<main className="grid min-h-dvh lg:grid-cols-2">
@@ -35,11 +37,25 @@ export function LoginView() {
 					noValidate
 				>
 					<div className="space-y-1">
-						<Heading>Welcome back</Heading>
-						<Text>Sign in to keep building workbooks for your class.</Text>
+						<Heading>Create your account</Heading>
+						<Text>
+							Start turning lesson ideas into ready-to-share workbooks.
+						</Text>
 					</div>
 
 					<div className="space-y-5">
+						<Field>
+							<Label>Your name</Label>
+							<Input
+								type="text"
+								name="name"
+								autoComplete="name"
+								required
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</Field>
+
 						<Field>
 							<Label>Email</Label>
 							<Input
@@ -57,29 +73,38 @@ export function LoginView() {
 							<Input
 								type="password"
 								name="password"
-								autoComplete="current-password"
+								autoComplete="new-password"
+								minLength={8}
 								required
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 							/>
 						</Field>
 
-						<div className="flex items-center justify-between">
-							<CheckboxField>
-								<Checkbox
-									name="remember"
-									checked={remember}
-									onChange={setRemember}
-								/>
-								<Label>Remember me</Label>
-							</CheckboxField>
-							<TSRLink
-								to="/"
-								className="text-sm text-zinc-600 underline decoration-zinc-950/30 hover:decoration-zinc-950 dark:text-zinc-400 dark:decoration-white/30 dark:hover:decoration-white"
-							>
-								Forgot password?
-							</TSRLink>
-						</div>
+						<CheckboxField>
+							<Checkbox
+								name="terms"
+								checked={acceptTerms}
+								onChange={setAcceptTerms}
+							/>
+							<Label>
+								I agree to the{" "}
+								<TSRLink
+									to="/"
+									className="underline decoration-zinc-950/40 hover:decoration-zinc-950 dark:decoration-white/40 dark:hover:decoration-white"
+								>
+									Terms
+								</TSRLink>{" "}
+								and{" "}
+								<TSRLink
+									to="/"
+									className="underline decoration-zinc-950/40 hover:decoration-zinc-950 dark:decoration-white/40 dark:hover:decoration-white"
+								>
+									Privacy Policy
+								</TSRLink>
+								.
+							</Label>
+						</CheckboxField>
 					</div>
 
 					<Button
@@ -88,16 +113,16 @@ export function LoginView() {
 						disabled={!canSubmit}
 						className="w-full"
 					>
-						Sign in
+						Create account
 					</Button>
 
 					<Text className="text-center">
-						New to Worboo?{" "}
+						Already have an account?{" "}
 						<TSRLink
-							to="/signup"
+							to="/login"
 							className="font-medium text-zinc-950 underline decoration-zinc-950/50 hover:decoration-zinc-950 dark:text-white dark:decoration-white/50 dark:hover:decoration-white"
 						>
-							Create an account
+							Sign in
 						</TSRLink>
 					</Text>
 				</form>
@@ -112,20 +137,18 @@ export function LoginView() {
 
 					<div className="max-w-md space-y-6">
 						<p className="font-display text-3xl leading-tight font-bold tracking-tight text-zinc-950 xl:text-4xl dark:text-white">
-							“A week of worksheet prep, done before my coffee goes cold.”
+							Build your first interactive workbook in under 90 seconds.
 						</p>
-						<div className="text-sm text-zinc-700 dark:text-zinc-300">
-							<p className="font-medium text-zinc-950 dark:text-white">
-								Marta Álvarez
-							</p>
-							<p>English teacher · B1–B2 adults</p>
-						</div>
+						<Text>
+							Free while in beta. No credit card. Cancel any time once we
+							launch.
+						</Text>
 					</div>
 
 					<ul className="grid gap-3 text-sm text-zinc-700 dark:text-zinc-300">
-						<li>· 90-second prompt-to-workbook</li>
-						<li>· Offline-ready, single HTML file</li>
-						<li>· CEFR-aware defaults out of the box</li>
+						<li>· Unlimited prompt-to-workbook drafts</li>
+						<li>· Self-grading exercises out of the box</li>
+						<li>· Export a single offline HTML file</li>
 					</ul>
 				</div>
 			</aside>
