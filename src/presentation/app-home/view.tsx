@@ -1,33 +1,25 @@
 import { ArrowUp } from "lucide-react";
 import { Button } from "#/presentation/components/catalyst/button";
 import { Textarea } from "#/presentation/components/catalyst/textarea";
-import Header from "./components/Header";
-import { SuggestionChip } from "./components/SuggestionChip";
-import { useHome } from "./hooks";
+import { useAppHome } from "./hooks";
 
-export function HomeView() {
-	const {
-		prompt,
-		setPrompt,
-		suggestions,
-		canSubmit,
-		applySuggestion,
-		handleSubmit,
-	} = useHome();
+export function AppHomeView() {
+	const { prompt, setPrompt, canSubmit, handleSubmit } = useAppHome();
 
 	return (
 		<>
-			<Header />
-			<main className="flex h-screen w-full flex-col items-center justify-center bg-hero-gradient">
-				<div className="w-full max-w-3xl text-center">
-					<h1 className="mt-6 font-display text-4xl leading-tight font-bold tracking-tight text-zinc-950 sm:text-6xl dark:text-white">
-						Create something teachers love
+			<div
+				aria-hidden="true"
+				className="pointer-events-none fixed inset-x-0 top-14 bottom-0 z-0 bg-hero-gradient lg:inset-2 lg:left-64 lg:rounded-lg"
+			/>
+			<div className="relative z-10 -m-6 flex min-h-[calc(100svh-3rem)] items-center justify-center px-6 py-16 lg:-m-10 lg:min-h-[calc(100svh-1rem)] lg:px-10">
+				<div className="w-full max-w-4xl text-center">
+					<h1 className="mx-auto max-w-3xl font-display text-4xl leading-tight font-bold tracking-tight text-zinc-950 sm:text-6xl dark:text-white">
+						Welcome back
 					</h1>
-
 					<p className="mx-auto mt-5 max-w-xl text-base text-zinc-600 sm:text-lg dark:text-zinc-400">
-						Describe your lesson. Get an interactive, self-grading workbook.
+						Describe a lesson. Get an interactive, self-grading workbook.
 					</p>
-
 					<form onSubmit={handleSubmit} className="mx-auto mt-10 text-left">
 						<div className="relative">
 							<Textarea
@@ -50,14 +42,8 @@ export function HomeView() {
 							</span>
 						</div>
 					</form>
-
-					<div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-						{suggestions.map((s) => (
-							<SuggestionChip key={s} label={s} onSelect={applySuggestion} />
-						))}
-					</div>
 				</div>
-			</main>
+			</div>
 		</>
 	);
 }

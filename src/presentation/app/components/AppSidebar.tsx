@@ -1,4 +1,5 @@
-import { History, Settings, SquarePen } from "lucide-react";
+import { useRouterState } from "@tanstack/react-router";
+import { History, House } from "lucide-react";
 import {
 	Sidebar,
 	SidebarBody,
@@ -25,6 +26,8 @@ export function AppSidebar({
 	isSigningOut,
 	onSignOut,
 }: AppSidebarProps) {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+
 	return (
 		<Sidebar>
 			<SidebarHeader>
@@ -33,17 +36,16 @@ export function AppSidebar({
 
 			<SidebarBody>
 				<SidebarSection>
-					<SidebarItem href="/app" current>
-						<SquarePen data-slot="icon" />
-						<SidebarLabel>New workbook</SidebarLabel>
+					<SidebarItem href="/dashboard" current={pathname === "/dashboard"}>
+						<House data-slot="icon" />
+						<SidebarLabel>Home</SidebarLabel>
 					</SidebarItem>
-					<SidebarItem href="/app">
+					<SidebarItem
+						href="/dashboard/history"
+						current={pathname.startsWith("/dashboard/history")}
+					>
 						<History data-slot="icon" />
 						<SidebarLabel>History</SidebarLabel>
-					</SidebarItem>
-					<SidebarItem href="/app">
-						<Settings data-slot="icon" />
-						<SidebarLabel>Settings</SidebarLabel>
 					</SidebarItem>
 				</SidebarSection>
 			</SidebarBody>

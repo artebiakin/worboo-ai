@@ -9,22 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './__root'
-import { Route as AppRouteImport } from './app'
+import { Route as DashboardRouteImport } from './dashboard'
 import { Route as IndexRouteImport } from './index'
+import { Route as DashboardIndexRouteImport } from './dashboard.index'
+import { Route as DashboardHistoryRouteImport } from './dashboard.history'
 import { Route as authSignupRouteImport } from './(auth)/signup'
 import { Route as authLoginRouteImport } from './(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './(auth)/forgot-password'
 import { Route as authAuthResetPasswordRouteImport } from './(auth)/auth.reset-password'
 
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const authSignupRoute = authSignupRouteImport.update({
   id: '/(auth)/signup',
@@ -49,59 +61,69 @@ const authAuthResetPasswordRoute = authAuthResetPasswordRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/auth/reset-password': typeof authAuthResetPasswordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/auth/reset-password': typeof authAuthResetPasswordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/(auth)/auth/reset-password': typeof authAuthResetPasswordRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/app'
+    | '/dashboard'
     | '/forgot-password'
     | '/login'
     | '/signup'
+    | '/dashboard/history'
+    | '/dashboard/'
     | '/auth/reset-password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/app'
     | '/forgot-password'
     | '/login'
     | '/signup'
+    | '/dashboard/history'
+    | '/dashboard'
     | '/auth/reset-password'
   id:
     | '__root__'
     | '/'
-    | '/app'
+    | '/dashboard'
     | '/(auth)/forgot-password'
     | '/(auth)/login'
     | '/(auth)/signup'
+    | '/dashboard/history'
+    | '/dashboard/'
     | '/(auth)/auth/reset-password'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authLoginRoute: typeof authLoginRoute
   authSignupRoute: typeof authSignupRoute
@@ -110,11 +132,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -123,6 +145,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/(auth)/signup': {
       id: '/(auth)/signup'
@@ -155,9 +191,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authLoginRoute: authLoginRoute,
   authSignupRoute: authSignupRoute,

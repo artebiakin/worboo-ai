@@ -1,4 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HomeView } from "#/presentation/home/view";
+import { MarketingView } from "#/presentation/marketing/view";
 
-export const Route = createFileRoute("/")({ component: HomeView });
+export const Route = createFileRoute("/")({ component: MarketingView });

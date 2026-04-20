@@ -59,8 +59,8 @@ src/
   app/
     routes/
       __root.tsx
-      index.tsx          ← thin: createFileRoute("/")({ component: HomeView })
-                           — imports HomeView from "#/presentation/home/view".
+      index.tsx          ← thin: createFileRoute("/")({ component: MarketingView })
+                           — imports MarketingView from "#/presentation/marketing/view".
       routeTree.gen.ts   ← generated, do not edit.
     providers/           ← root-level React providers (mounted once in __root.tsx).
       posthog/

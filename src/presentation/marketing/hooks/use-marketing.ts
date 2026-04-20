@@ -7,7 +7,7 @@ const SUGGESTIONS = [
 	"Vocabulary: travel & transportation",
 ];
 
-export function useHome() {
+export function useMarketing() {
 	const [prompt, setPrompt] = useState("");
 
 	return {
