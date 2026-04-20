@@ -1,4 +1,4 @@
-import { History, Inbox, Settings, SquarePen } from "lucide-react";
+import { History, Settings, SquarePen } from "lucide-react";
 import {
 	Sidebar,
 	SidebarBody,
@@ -10,6 +10,7 @@ import {
 } from "#/presentation/components/catalyst/sidebar";
 import Logo from "#/presentation/components/Logo";
 import { AccountMenu } from "./AccountMenu";
+import { InboxMenu } from "./InboxMenu";
 
 interface AppSidebarProps {
 	email: string;
@@ -55,13 +56,7 @@ export function AppSidebar({
 						isSigningOut={isSigningOut}
 						onSignOut={onSignOut}
 					/>
-					<button
-						type="button"
-						aria-label="Inbox"
-						className="inline-flex size-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-950/5 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white"
-					>
-						<Inbox className="size-5" />
-					</button>
+					<InboxMenu />
 				</div>
 			</SidebarFooter>
 		</Sidebar>
