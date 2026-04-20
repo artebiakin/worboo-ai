@@ -12,7 +12,7 @@ Web app for language teachers to generate interactive student workbooks in under
 - **Icons:** `lucide-react`.
 - **Tooling:** Biome (format + lint), Vitest, pnpm
 - **Analytics:** PostHog
-- **Backend:** Supabase — Postgres, Auth, Storage, Realtime. Client lives in `src/infrastructure/supabase/`; uses `@supabase/ssr` (`createBrowserClient`) so cookie-based auth works correctly under TanStack Start SSR. Add a `createServerClient` factory the first time server-side auth is needed.
+- **Backend:** Supabase — Postgres, Auth, Storage, Realtime. Client lives in `src/infrastructure/supabase/`; uses `@supabase/ssr` (`createBrowserClient`) so cookie-based auth works correctly under TanStack Start SSR. Add a `createServerClient` factory the first time server-side auth is needed. The database is **closed by default**: every table ships with RLS enabled and each migration opens only the operations the current feature uses — see [`.claude/rules/database-security.md`](.claude/rules/database-security.md).
 - **Env / validation:** `@t3-oss/env-core` + Zod. Required client vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (see `.env.example`).
 
 ## Commands
@@ -36,6 +36,7 @@ Web app for language teachers to generate interactive student workbooks in under
   - Hover/focus/active — `transition-colors hover:… focus-visible:… active:…` on the interactive element.
   - Conditional UI (Headless UI panels, Catalyst Dialog/Dropdown) — animate via Headless UI's `data-[state=open]`/`data-[closed]` attributes with Tailwind utilities. If you need richer keyframes (`animate-in`/`fade-in`/`slide-in-from-*`), add `tw-animate-css`; otherwise use plain `transition-*` + `opacity`/`translate`/`scale` utilities.
   - Loading/status — Tailwind's built-in `animate-pulse`, `animate-spin`, `animate-bounce`, etc.
+- **Async states (loading + error):** data-dependent regions render a **skeleton** that mirrors the loaded shape (no spinners); every async error is caught and **presented to the user** — inline for query errors, `sonner` toast for mutation errors. See [`.claude/rules/ui-async-states.md`](.claude/rules/ui-async-states.md).
 - **Reduced motion:** use Tailwind's `motion-reduce:` variant to disable transforms/animations when the user prefers reduced motion (`motion-reduce:transition-none motion-reduce:animate-none`).
 - **Routes:** drop files under `src/routes/`. The route tree regenerates on dev/build.
 - **Components:** PascalCase files in `src/presentation/components/`. Catalyst primitives live in `src/presentation/components/catalyst/`.
