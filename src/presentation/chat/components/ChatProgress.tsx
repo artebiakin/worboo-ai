@@ -1,5 +1,4 @@
-import { BookOpen, Check, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Check, Loader2 } from "lucide-react";
 
 const STEPS = [
 	{ id: "understanding", label: "Understanding your request" },
@@ -10,12 +9,11 @@ const STEPS = [
 
 const STEP_SIZE = 100 / STEPS.length;
 
-interface ChatGeneratingProps {
-	prompt: string;
+interface ChatProgressProps {
+	percent: number;
 }
 
-export function ChatGenerating({ prompt }: ChatGeneratingProps) {
-	const percent = useFakeProgress();
+export function ChatProgress({ percent }: ChatProgressProps) {
 	const currentIndex = Math.min(
 		Math.floor(percent / STEP_SIZE),
 		STEPS.length - 1,
@@ -23,9 +21,7 @@ export function ChatGenerating({ prompt }: ChatGeneratingProps) {
 	const current = STEPS[currentIndex];
 
 	return (
-		<div className="mx-auto w-full max-w-3xl space-y-6">
-			<PromptCard prompt={prompt} />
-
+		<>
 			<div className="space-y-4">
 				<div className="flex items-center justify-between gap-4">
 					<div className="flex min-w-0 items-center gap-2">
@@ -74,21 +70,8 @@ export function ChatGenerating({ prompt }: ChatGeneratingProps) {
 			<p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
 				Creating your lesson. This usually takes 10–20 seconds.
 			</p>
-		</div>
+		</>
 	);
-}
-
-function useFakeProgress() {
-	const [percent, setPercent] = useState(0);
-
-	useEffect(() => {
-		const id = setInterval(() => {
-			setPercent((p) => (p >= 99 ? p : p + 1));
-		}, 150);
-		return () => clearInterval(id);
-	}, []);
-
-	return percent;
 }
 
 function stepState(i: number, percent: number): "done" | "current" | "pending" {
@@ -97,22 +80,6 @@ function stepState(i: number, percent: number): "done" | "current" | "pending" {
 	if (percent >= end) return "done";
 	if (percent >= start) return "current";
 	return "pending";
-}
-
-function PromptCard({ prompt }: { prompt: string }) {
-	return (
-		<div className="flex flex-col items-center gap-3 rounded-lg border border-zinc-950/10 bg-white p-6 text-center dark:border-white/10 dark:bg-zinc-900">
-			<div className="flex size-10 items-center justify-center rounded-md bg-zinc-950/5 dark:bg-white/5">
-				<BookOpen className="size-5 text-zinc-500 dark:text-zinc-400" />
-			</div>
-			<div>
-				<p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-					Your prompt
-				</p>
-				<p className="mt-1 text-zinc-950 dark:text-white">{prompt}</p>
-			</div>
-		</div>
-	);
 }
 
 function StepMarker({ state }: { state: "done" | "current" | "pending" }) {
