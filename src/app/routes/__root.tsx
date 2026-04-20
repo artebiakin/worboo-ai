@@ -8,7 +8,6 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import PostHogProvider from "#/app/providers/posthog/provider";
 import TanStackQueryDevtools from "#/app/providers/tanstack-query/devtools";
-import Header from "#/presentation/components/Header";
 import appCss from "#/styles.css?url";
 
 interface MyRouterContext {
@@ -51,7 +50,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<PostHogProvider>
-					<Header />
 					{children}
 					<TanStackDevtools
 						config={{
