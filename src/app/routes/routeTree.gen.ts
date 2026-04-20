@@ -13,6 +13,7 @@ import { Route as DashboardRouteImport } from './dashboard'
 import { Route as IndexRouteImport } from './index'
 import { Route as DashboardIndexRouteImport } from './dashboard.index'
 import { Route as DashboardHistoryRouteImport } from './dashboard.history'
+import { Route as DashboardChatsRouteImport } from './dashboard.chats'
 import { Route as authSignupRouteImport } from './(auth)/signup'
 import { Route as authLoginRouteImport } from './(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './(auth)/forgot-password'
@@ -36,6 +37,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardChatsRoute = DashboardChatsRouteImport.update({
+  id: '/chats',
+  path: '/chats',
   getParentRoute: () => DashboardRoute,
 } as any)
 const authSignupRoute = authSignupRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
+  '/dashboard/chats': typeof DashboardChatsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/auth/reset-password': typeof authAuthResetPasswordRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
+  '/dashboard/chats': typeof DashboardChatsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard': typeof DashboardIndexRoute
   '/auth/reset-password': typeof authAuthResetPasswordRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
+  '/dashboard/chats': typeof DashboardChatsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/(auth)/auth/reset-password': typeof authAuthResetPasswordRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/signup'
+    | '/dashboard/chats'
     | '/dashboard/history'
     | '/dashboard/'
     | '/auth/reset-password'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/signup'
+    | '/dashboard/chats'
     | '/dashboard/history'
     | '/dashboard'
     | '/auth/reset-password'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/(auth)/forgot-password'
     | '/(auth)/login'
     | '/(auth)/signup'
+    | '/dashboard/chats'
     | '/dashboard/history'
     | '/dashboard/'
     | '/(auth)/auth/reset-password'
@@ -160,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistoryRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/chats': {
+      id: '/dashboard/chats'
+      path: '/chats'
+      fullPath: '/dashboard/chats'
+      preLoaderRoute: typeof DashboardChatsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/(auth)/signup': {
       id: '/(auth)/signup'
       path: '/signup'
@@ -192,11 +211,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteChildren {
+  DashboardChatsRoute: typeof DashboardChatsRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardChatsRoute: DashboardChatsRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

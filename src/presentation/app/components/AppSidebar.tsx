@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { History, House } from "lucide-react";
+import { History, House, MessageSquare } from "lucide-react";
 import {
 	Sidebar,
 	SidebarBody,
@@ -39,6 +39,13 @@ export function AppSidebar({
 					<SidebarItem href="/dashboard" current={pathname === "/dashboard"}>
 						<House data-slot="icon" />
 						<SidebarLabel>Home</SidebarLabel>
+					</SidebarItem>
+					<SidebarItem
+						href="/dashboard/chats"
+						current={pathname.startsWith("/dashboard/chats")}
+					>
+						<MessageSquare data-slot="icon" />
+						<SidebarLabel>Chats</SidebarLabel>
 					</SidebarItem>
 					<SidebarItem
 						href="/dashboard/history"
