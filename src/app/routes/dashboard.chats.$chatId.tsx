@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useLocation } from "@tanstack/react-router";
 import { ChatView } from "#/presentation/chat/view";
 
 export const Route = createFileRoute("/dashboard/chats/$chatId")({
@@ -7,5 +7,6 @@ export const Route = createFileRoute("/dashboard/chats/$chatId")({
 
 function ChatRoute() {
 	const { chatId } = Route.useParams();
-	return <ChatView chatId={chatId} />;
+	const { state } = useLocation();
+	return <ChatView chatId={chatId} initialPrompt={state.initialPrompt} />;
 }
