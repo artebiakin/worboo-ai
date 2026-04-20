@@ -1,6 +1,10 @@
 import { Link as TSRLink } from "@tanstack/react-router";
 import { Button } from "#/presentation/components/catalyst/button";
-import { Field, Label } from "#/presentation/components/catalyst/fieldset";
+import {
+	ErrorMessage,
+	Field,
+	Label,
+} from "#/presentation/components/catalyst/fieldset";
 import { Heading } from "#/presentation/components/catalyst/heading";
 import { Input } from "#/presentation/components/catalyst/input";
 import { Text } from "#/presentation/components/catalyst/text";
@@ -8,7 +12,7 @@ import Logo from "#/presentation/components/Logo";
 import { useForgotPassword } from "./hooks";
 
 export function ForgotPasswordView() {
-	const { email, setEmail, isSubmitted, canSubmit, handleSubmit } =
+	const { form, isSubmitting, isSubmitted, submittedEmail } =
 		useForgotPassword();
 
 	return (
@@ -23,8 +27,8 @@ export function ForgotPasswordView() {
 						<div className="space-y-2">
 							<Heading>Check your inbox</Heading>
 							<Text>
-								If an account exists for <strong>{email}</strong>, we just sent
-								a link to reset your password.
+								If an account exists for <strong>{submittedEmail}</strong>, we
+								just sent a link to reset your password.
 							</Text>
 						</div>
 						<Text>
@@ -40,7 +44,10 @@ export function ForgotPasswordView() {
 					</div>
 				) : (
 					<form
-						onSubmit={handleSubmit}
+						onSubmit={(e) => {
+							e.preventDefault();
+							form.handleSubmit();
+						}}
 						className="w-full max-w-sm space-y-6"
 						noValidate
 					>
@@ -53,26 +60,36 @@ export function ForgotPasswordView() {
 						</div>
 
 						<div className="space-y-5">
-							<Field>
-								<Label>Email</Label>
-								<Input
-									type="email"
-									name="email"
-									autoComplete="email"
-									required
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-								/>
-							</Field>
+							<form.Field name="email">
+								{(field) => (
+									<Field>
+										<Label>Email</Label>
+										<Input
+											type="email"
+											name={field.name}
+											autoComplete="email"
+											value={field.state.value}
+											onChange={(e) => field.handleChange(e.target.value)}
+											onBlur={field.handleBlur}
+											invalid={field.state.meta.errors.length > 0}
+										/>
+										{field.state.meta.errors.length > 0 ? (
+											<ErrorMessage>
+												{field.state.meta.errors[0]?.message}
+											</ErrorMessage>
+										) : null}
+									</Field>
+								)}
+							</form.Field>
 						</div>
 
 						<Button
 							type="submit"
 							color="violet"
-							disabled={!canSubmit}
+							disabled={isSubmitting}
 							className="w-full"
 						>
-							Send reset link
+							{isSubmitting ? "Sending…" : "Send reset link"}
 						</Button>
 
 						<Text className="text-center">

@@ -9,11 +9,10 @@ import { Heading } from "#/presentation/components/catalyst/heading";
 import { Input } from "#/presentation/components/catalyst/input";
 import { Text } from "#/presentation/components/catalyst/text";
 import Logo from "#/presentation/components/Logo";
-import { OAuthButtons } from "#/presentation/components/OAuthButtons";
-import { useLogin } from "./hooks";
+import { useResetPassword } from "./hooks";
 
-export function LoginView() {
-	const { form, isSubmitting, handleOAuth } = useLogin();
+export function ResetPasswordView() {
+	const { form, isSubmitting } = useResetPassword();
 
 	return (
 		<main className="grid min-h-dvh lg:grid-cols-2">
@@ -21,6 +20,7 @@ export function LoginView() {
 				<div className="absolute top-3 left-6 sm:top-4 sm:left-8 lg:left-12">
 					<Logo />
 				</div>
+
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
@@ -30,51 +30,19 @@ export function LoginView() {
 					noValidate
 				>
 					<div className="space-y-1">
-						<Heading>Welcome back</Heading>
-						<Text>Sign in to keep building workbooks for your class.</Text>
-					</div>
-
-					<OAuthButtons onProvider={handleOAuth} disabled={isSubmitting} />
-
-					<div className="flex items-center gap-4">
-						<div className="h-px flex-1 bg-zinc-950/10 dark:bg-white/10" />
-						<Text className="text-xs uppercase tracking-wide">
-							or continue with email
-						</Text>
-						<div className="h-px flex-1 bg-zinc-950/10 dark:bg-white/10" />
+						<Heading>Set a new password</Heading>
+						<Text>Pick something you'll remember. At least 8 characters.</Text>
 					</div>
 
 					<div className="space-y-5">
-						<form.Field name="email">
-							{(field) => (
-								<Field>
-									<Label>Email</Label>
-									<Input
-										type="email"
-										name={field.name}
-										autoComplete="email"
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-										invalid={field.state.meta.errors.length > 0}
-									/>
-									{field.state.meta.errors.length > 0 ? (
-										<ErrorMessage>
-											{field.state.meta.errors[0]?.message}
-										</ErrorMessage>
-									) : null}
-								</Field>
-							)}
-						</form.Field>
-
 						<form.Field name="password">
 							{(field) => (
 								<Field>
-									<Label>Password</Label>
+									<Label>New password</Label>
 									<Input
 										type="password"
 										name={field.name}
-										autoComplete="current-password"
+										autoComplete="new-password"
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.target.value)}
 										onBlur={field.handleBlur}
@@ -89,14 +57,27 @@ export function LoginView() {
 							)}
 						</form.Field>
 
-						<div className="flex items-center justify-end">
-							<TSRLink
-								to="/forgot-password"
-								className="text-sm text-zinc-600 underline decoration-zinc-950/30 hover:decoration-zinc-950 dark:text-zinc-400 dark:decoration-white/30 dark:hover:decoration-white"
-							>
-								Forgot password?
-							</TSRLink>
-						</div>
+						<form.Field name="confirm">
+							{(field) => (
+								<Field>
+									<Label>Confirm password</Label>
+									<Input
+										type="password"
+										name={field.name}
+										autoComplete="new-password"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.target.value)}
+										onBlur={field.handleBlur}
+										invalid={field.state.meta.errors.length > 0}
+									/>
+									{field.state.meta.errors.length > 0 ? (
+										<ErrorMessage>
+											{field.state.meta.errors[0]?.message}
+										</ErrorMessage>
+									) : null}
+								</Field>
+							)}
+						</form.Field>
 					</div>
 
 					<Button
@@ -105,16 +86,15 @@ export function LoginView() {
 						disabled={isSubmitting}
 						className="w-full"
 					>
-						{isSubmitting ? "Signing in…" : "Sign in"}
+						{isSubmitting ? "Updating…" : "Update password"}
 					</Button>
 
 					<Text className="text-center">
-						New to Worboo?{" "}
 						<TSRLink
-							to="/signup"
+							to="/login"
 							className="font-medium text-zinc-950 underline decoration-zinc-950/50 hover:decoration-zinc-950 dark:text-white dark:decoration-white/50 dark:hover:decoration-white"
 						>
-							Create an account
+							Back to sign in
 						</TSRLink>
 					</Text>
 				</form>
@@ -129,20 +109,18 @@ export function LoginView() {
 
 					<div className="max-w-md space-y-6">
 						<p className="font-display text-3xl leading-tight font-bold tracking-tight text-zinc-950 xl:text-4xl dark:text-white">
-							“A week of worksheet prep, done before my coffee goes cold.”
+							One more step and you're back in.
 						</p>
-						<div className="text-sm text-zinc-700 dark:text-zinc-300">
-							<p className="font-medium text-zinc-950 dark:text-white">
-								Marta Álvarez
-							</p>
-							<p>English teacher · B1–B2 adults</p>
-						</div>
+						<Text>
+							For safety, this link only works once. If it expires, just request
+							a new reset email.
+						</Text>
 					</div>
 
 					<ul className="grid gap-3 text-sm text-zinc-700 dark:text-zinc-300">
-						<li>· 90-second prompt-to-workbook</li>
-						<li>· Offline-ready, single HTML file</li>
-						<li>· CEFR-aware defaults out of the box</li>
+						<li>· Minimum 8 characters</li>
+						<li>· Use a passphrase you'll remember</li>
+						<li>· Other signed-in devices stay signed in</li>
 					</ul>
 				</div>
 			</aside>

@@ -6,8 +6,10 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "sonner";
 import PostHogProvider from "#/app/providers/posthog/provider";
 import TanStackQueryDevtools from "#/app/providers/tanstack-query/devtools";
+import { useTheme } from "#/presentation/hooks";
 import appCss from "#/styles.css?url";
 
 interface MyRouterContext {
@@ -41,6 +43,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const { resolvedTheme } = useTheme();
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
@@ -51,6 +54,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body>
 				<PostHogProvider>
 					{children}
+					<Toaster position="top-right" theme={resolvedTheme} richColors />
 					<TanStackDevtools
 						config={{
 							position: "bottom-right",
