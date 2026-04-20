@@ -7,13 +7,13 @@ export async function signUpWithPassword({
 }: {
 	email: string;
 	password: string;
-	fullName?: string;
+	fullName: string;
 }): Promise<void> {
 	const { error } = await supabase.auth.signUp({
 		email,
 		password,
 		options: {
-			data: fullName ? { full_name: fullName } : undefined,
+			data: { full_name: fullName },
 			emailRedirectTo:
 				typeof window !== "undefined"
 					? `${window.location.origin}/`

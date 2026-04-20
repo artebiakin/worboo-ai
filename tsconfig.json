@@ -8,7 +8,8 @@
     "node_modules",
     "dist",
     "build",
-    "src/presentation/components/catalyst"
+    "src/presentation/components/catalyst",
+    "src/presentation/components/shadcn"
   ],
   "compilerOptions": {
     "target": "ES2022",

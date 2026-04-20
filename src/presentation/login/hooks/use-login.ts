@@ -23,7 +23,7 @@ export function useLogin() {
 			setIsSubmitting(true);
 			try {
 				await signInWithPassword(value);
-				await navigate({ to: "/" });
+				await navigate({ to: "/app" });
 			} catch (err) {
 				log.error("sign-in with password failed", err);
 				toast.error(err instanceof Error ? err.message : "Could not sign in.");

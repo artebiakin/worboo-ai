@@ -7,7 +7,7 @@ Web app for language teachers to generate interactive student workbooks in under
 - **Framework:** TanStack Start (Vite, React 19, SSR)
 - **Routing:** TanStack Router — file-based, routes live under `src/app/routes/`, tree auto-generated at `src/app/routes/routeTree.gen.ts` (do not edit)
 - **Data / forms:** TanStack Query, TanStack Form
-- **UI:** Catalyst (Tailwind Labs' React UI kit) + Tailwind CSS v4. Catalyst is built on Headless UI and ships as source files under `src/presentation/components/catalyst/` — do not replace with shadcn/Radix.
+- **UI:** Catalyst (Tailwind Labs' React UI kit, primary) + Tailwind CSS v4. Catalyst is built on Headless UI and ships as source files under `src/presentation/components/catalyst/`. Shadcn/Radix components are allowed *as a secondary kit* for patterns Catalyst doesn't cover cleanly (e.g. submenus) and live under `src/presentation/components/shadcn/`. Prefer Catalyst first; reach for shadcn only when needed.
 - **Animation:** Tailwind CSS utilities only — `transition-*`, `animate-*`, `hover:*`, `focus:*`, `active:*`, `data-[state=*]:*`. No JS animation library (no `motion`, no `framer-motion`). Static content does not animate.
 - **Icons:** `lucide-react`.
 - **Tooling:** Biome (format + lint), Vitest, pnpm
@@ -29,7 +29,8 @@ Web app for language teachers to generate interactive student workbooks in under
 - **Imports:** use the `#/*` alias for `src/*` — e.g. `import { Button } from "#/presentation/components/catalyst/button"`.
 - **Styling:** Tailwind v4 utilities + Catalyst components only. No custom CSS classes or CSS variables outside the theme tokens in `src/styles.css`.
 - **Catalyst is vendored and read-only.** Files under `src/presentation/components/catalyst/` are treated as third-party source. **Do not edit them — ever.** Not for styling tweaks, not for behaviour changes, not for bug fixes. The only sanctioned exception is `catalyst/link.tsx`, which Catalyst itself ships with a TODO instructing you to wire it to the app's router.
-- **Extending Catalyst:** compose wrappers in `src/presentation/components/` that import from `src/presentation/components/catalyst/`. If a primitive is missing, copy the official Catalyst source into `src/presentation/components/catalyst/` unmodified — never hand-roll with Radix/shadcn, and never "simplify" what you paste in.
+- **Shadcn is also vendored and read-only.** Files under `src/presentation/components/shadcn/` are treated the same as Catalyst — **do not edit them.** To adjust styling on a shadcn component, pass `className` at the call site; `cn()` + `tailwind-merge` ensures consumer classes win over shadcn defaults. To add a new shadcn primitive, copy the official source in unmodified.
+- **Extending Catalyst/shadcn:** compose wrappers in `src/presentation/components/` that import from the vendored folders. If a primitive is missing, copy its official source in unmodified — never hand-roll the internals, and never "simplify" what you paste in.
 - **Animation scope:** only add `transition-*` or `animate-*` classes to **interactive elements** (buttons, links, form controls, modals, toasts, dropdowns) or elements that **explicitly change state** (loading skeletons, status indicators). Never add animation classes to static containers, text nodes, or layout wrappers. There is no escape hatch for static-content reveals — if it's static, it doesn't animate.
 - **Patterns:**
   - Hover/focus/active — `transition-colors hover:… focus-visible:… active:…` on the interactive element.
