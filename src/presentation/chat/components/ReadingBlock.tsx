@@ -54,7 +54,7 @@ function QuestionContent({
 }) {
 	const [answer, setAnswer] = useState<string | null>(null);
 	const typeLabel =
-		question.kind === "multiple-choice" ? "Multiple Choice" : "True / False";
+		question.kind === "multipleChoice" ? "Multiple Choice" : "True / False";
 
 	return (
 		<div className="space-y-5">
@@ -70,7 +70,7 @@ function QuestionContent({
 				{answer !== null ? <StatusPill answered /> : null}
 			</div>
 
-			{question.kind === "multiple-choice" ? (
+			{question.kind === "multipleChoice" ? (
 				<MultipleChoiceOptions
 					name={label}
 					options={question.options}

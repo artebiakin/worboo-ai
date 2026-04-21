@@ -4,7 +4,7 @@ import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import type { Exercise } from "./mock-workbook";
 import { StatusPill } from "./StatusPill";
 
-type MultipleChoiceExercise = Extract<Exercise, { kind: "multiple-choice" }>;
+type MultipleChoiceExercise = Extract<Exercise, { kind: "multipleChoice" }>;
 
 interface MultipleChoiceBlockProps {
 	exercise: MultipleChoiceExercise;

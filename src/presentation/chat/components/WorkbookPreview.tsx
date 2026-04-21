@@ -33,11 +33,11 @@ function ExerciseBlock({ exercise }: { exercise: Exercise }) {
 	switch (exercise.kind) {
 		case "reading":
 			return <ReadingBlock exercise={exercise} />;
-		case "multiple-choice":
+		case "multipleChoice":
 			return <MultipleChoiceBlock exercise={exercise} />;
-		case "true-false":
+		case "trueFalse":
 			return <TrueFalseBlock exercise={exercise} />;
-		case "fill-blank":
+		case "fillBlank":
 			return <FillBlankBlock exercise={exercise} />;
 		case "matching":
 			return <MatchingBlock exercise={exercise} />;

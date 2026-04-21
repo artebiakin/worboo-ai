@@ -5,9 +5,9 @@ type ExerciseKind = Exercise["kind"];
 
 const KIND_LABEL: Record<ExerciseKind, string> = {
 	reading: "Reading",
-	"multiple-choice": "Multiple choice",
-	"true-false": "True or false",
-	"fill-blank": "Fill in the blank",
+	multipleChoice: "Multiple choice",
+	trueFalse: "True or false",
+	fillBlank: "Fill in the blank",
 	matching: "Matching",
 };
 

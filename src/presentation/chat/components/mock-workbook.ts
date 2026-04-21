@@ -38,13 +38,13 @@ export const FILL_BLANK_PLACEHOLDER = "{{blank}}";
 
 export type ReadingQuestion =
 	| {
-			kind: "multiple-choice";
+			kind: "multipleChoice";
 			prompt: string;
 			options: MultipleChoiceOption[];
 			canonicalExplanation: string;
 	  }
 	| ({
-			kind: "true-false";
+			kind: "trueFalse";
 			prompt: string;
 			statement: string;
 			canonicalExplanation: string;
@@ -59,18 +59,18 @@ export type Exercise =
 			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
-			kind: "multiple-choice";
+			kind: "multipleChoice";
 			prompt: string;
 			options: MultipleChoiceOption[];
 			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
-			kind: "true-false";
+			kind: "trueFalse";
 			statement: string;
 			canonicalExplanation: string;
 	  } & TrueFalseAnswer)
 	| (ExerciseBase & {
-			kind: "fill-blank";
+			kind: "fillBlank";
 			sentence: string;
 			blanks: FillBlank[];
 			canonicalExplanation: string;
@@ -132,7 +132,7 @@ export const MOCK_WORKBOOK: Workbook = {
 			text: "Last Saturday, Mia went to the cinema with her brother. They watched a funny film about a family who moved to the countryside. After the film, they ate pizza at a small restaurant near the cinema. On Sunday morning, Mia didn't go out. She stayed at home and read a book. In the afternoon, her grandmother visited and they made a cake together.",
 			questions: [
 				{
-					kind: "multiple-choice",
+					kind: "multipleChoice",
 					prompt: "Where did Mia go on Saturday?",
 					options: [
 						{
@@ -164,7 +164,7 @@ export const MOCK_WORKBOOK: Workbook = {
 						"Find the Saturday time marker and the action that immediately follows it — the cinema is named in the first sentence.",
 				},
 				{
-					kind: "true-false",
+					kind: "trueFalse",
 					prompt: "True or false?",
 					statement: "Mia went out on Sunday morning.",
 					correctAnswer: false,
@@ -177,7 +177,7 @@ export const MOCK_WORKBOOK: Workbook = {
 						"Watch for negation: 'didn't go out' reverses 'went out'. A single 'not' flips the truth of the whole statement.",
 				},
 				{
-					kind: "multiple-choice",
+					kind: "multipleChoice",
 					prompt: "What did Mia and her grandmother do together?",
 					options: [
 						{
@@ -214,7 +214,7 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 2,
-			kind: "multiple-choice",
+			kind: "multipleChoice",
 			prompt: "Last night I ___ a great film with my family.",
 			options: [
 				{
@@ -241,7 +241,7 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 3,
-			kind: "true-false",
+			kind: "trueFalse",
 			statement: "I goed to the beach last weekend.",
 			correctAnswer: false,
 			correction: "I went to the beach last weekend.",
@@ -256,7 +256,7 @@ export const MOCK_WORKBOOK: Workbook = {
 			id: 4,
 			instructions:
 				"Complete each blank with the past simple of the verb in parentheses.",
-			kind: "fill-blank",
+			kind: "fillBlank",
 			sentence: "On Friday night, we {{blank}} a film and {{blank}} pizza.",
 			blanks: [
 				{
@@ -295,7 +295,7 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 6,
-			kind: "multiple-choice",
+			kind: "multipleChoice",
 			prompt: "Which question is correctly formed in the Past Simple?",
 			options: [
 				{
@@ -328,7 +328,7 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 7,
-			kind: "fill-blank",
+			kind: "fillBlank",
 			sentence: "Last Saturday morning, I {{blank}} at ten o'clock.",
 			blanks: [
 				{
@@ -343,7 +343,7 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 8,
-			kind: "true-false",
+			kind: "trueFalse",
 			statement: "The past simple of 'buy' is 'buyed'.",
 			correctAnswer: false,
 			correction: "The past simple of 'buy' is 'bought'.",
@@ -370,9 +370,9 @@ export const MOCK_WORKBOOK: Workbook = {
 		chosenDurationMinutes: 30,
 		chosenExerciseCounts: {
 			reading: 1,
-			"multiple-choice": 2,
-			"true-false": 2,
-			"fill-blank": 2,
+			multipleChoice: 2,
+			trueFalse: 2,
+			fillBlank: 2,
 			matching: 1,
 		},
 		chosenDifficultyDistribution: "progressive",

@@ -5,7 +5,7 @@ import type { Exercise } from "./mock-workbook";
 import { optionCardStyle } from "./option-card-style";
 import { StatusPill } from "./StatusPill";
 
-type TrueFalseExercise = Extract<Exercise, { kind: "true-false" }>;
+type TrueFalseExercise = Extract<Exercise, { kind: "trueFalse" }>;
 
 interface TrueFalseBlockProps {
 	exercise: TrueFalseExercise;
