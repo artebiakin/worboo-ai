@@ -83,6 +83,22 @@ export type Exercise =
 			canonicalExplanation: string;
 	  });
 
+export type SkillFocus = "grammar" | "vocabulary" | "reading" | "mixed";
+export type AgeGroup = "children" | "teenagers" | "adults";
+export type DifficultyDistribution = "progressive" | "uniform";
+
+export interface WorkbookReasoning {
+	detectedLanguage: string;
+	detectedLevel: string | null;
+	chosenTopic: string;
+	chosenSkillFocus: SkillFocus;
+	chosenAgeGroup: AgeGroup;
+	chosenDurationMinutes: number;
+	chosenExerciseCounts: Record<string, number>;
+	chosenDifficultyDistribution: DifficultyDistribution;
+	notes?: string;
+}
+
 export interface Workbook {
 	topic: string;
 	language: string;
@@ -91,6 +107,8 @@ export interface Workbook {
 	intro: string;
 	objectives: string[];
 	exercises: Exercise[];
+	suggestions: string[];
+	reasoning: WorkbookReasoning;
 }
 
 export const MOCK_WORKBOOK: Workbook = {
@@ -352,4 +370,28 @@ export const MOCK_WORKBOOK: Workbook = {
 				"'Buy' is irregular: past simple 'bought'. The regular -ed ending doesn't apply to every verb.",
 		},
 	],
+	suggestions: [
+		"english-a2-past-continuous",
+		"english-a2-irregular-verbs-list",
+		"english-a2-time-expressions",
+		"english-a2-questions-and-answers",
+	],
+	reasoning: {
+		detectedLanguage: "English",
+		detectedLevel: "A2",
+		chosenTopic: "Past simple",
+		chosenSkillFocus: "grammar",
+		chosenAgeGroup: "teenagers",
+		chosenDurationMinutes: 30,
+		chosenExerciseCounts: {
+			reading: 1,
+			"multiple-choice": 2,
+			"true-false": 2,
+			"fill-blank": 2,
+			matching: 1,
+		},
+		chosenDifficultyDistribution: "progressive",
+		notes:
+			"Anchored in a weekend-narrative context to give the grammar real referents. Mix leans on the four highest-frequency irregular verbs (go, have, do, see) so the irregular/regular contrast is visible.",
+	},
 };
