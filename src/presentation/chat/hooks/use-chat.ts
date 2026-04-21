@@ -65,7 +65,7 @@ function derivePhase({
 	analysisPercent: number;
 	buildPercent: number;
 }): ChatPhase {
-	if (prompt === null) return "composer";
+	if (prompt === null) return "preview";
 	if (!generateStarted)
 		return analysisPercent >= 100 ? "questions" : "analyzing";
 	return buildPercent >= 100 ? "preview" : "building";

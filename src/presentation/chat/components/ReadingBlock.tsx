@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Exercise, ReadingQuestion } from "#/domain/workbook";
-import { ExerciseCard } from "./ExerciseCard";
+import { ExerciseCard, KIND_DEFAULT_INSTRUCTIONS } from "./ExerciseCard";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { optionCardStyle } from "./option-card-style";
 import { StatusPill } from "./StatusPill";
@@ -19,23 +19,18 @@ export function ReadingBlock({ exercise }: ReadingBlockProps) {
 			instructions={exercise.instructions}
 		>
 			<blockquote className="space-y-3 border-l-4 border-zinc-950/20 pl-6 dark:border-white/20">
-				<h3 className="font-display text-xl font-bold tracking-tight text-zinc-950 dark:text-white">
+				<h3 className="font-display text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
 					{exercise.title}
 				</h3>
-				<p className="text-lg leading-relaxed text-zinc-950 dark:text-white">
-					"{exercise.text}"
-				</p>
+				<p className="exercise-focal">“{exercise.text}”</p>
 			</blockquote>
 
-			<ol className="divide-y divide-zinc-950/10 dark:divide-white/10">
+			<ol className="mt-6 divide-y divide-zinc-950/10 border-t border-zinc-950/10 pt-6 dark:divide-white/10 dark:border-white/10">
 				{exercise.questions.map((q, i) => {
 					const letter = String.fromCharCode(65 + i);
 					const label = `Question ${exercise.id}${letter}`;
 					return (
-						<li
-							key={`${label}-${q.prompt}`}
-							className="py-6 first:pt-0 last:pb-0"
-						>
+						<li key={label} className="py-6 first:pt-0 last:pb-0">
 							<QuestionContent question={q} label={label} />
 						</li>
 					);
@@ -59,12 +54,17 @@ function QuestionContent({
 	return (
 		<div className="space-y-5">
 			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0 space-y-1">
-					<p className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+				<div className="min-w-0">
+					<p className="exercise-label">
 						{label} · {typeLabel}
 					</p>
-					<p className="text-lg text-zinc-950 dark:text-white">
-						{question.prompt}
+					<p className="exercise-instructions mt-2">
+						{KIND_DEFAULT_INSTRUCTIONS[question.kind]}
+					</p>
+					<p className="exercise-focal mt-2">
+						{question.kind === "multipleChoice"
+							? question.prompt
+							: `“${question.statement}”`}
 					</p>
 				</div>
 				{answer !== null ? <StatusPill answered /> : null}
@@ -80,7 +80,6 @@ function QuestionContent({
 			) : (
 				<TrueFalseOptions
 					name={label}
-					statement={question.statement}
 					selected={answer}
 					onSelect={setAnswer}
 				/>
@@ -91,38 +90,33 @@ function QuestionContent({
 
 function TrueFalseOptions({
 	name,
-	statement,
 	selected,
 	onSelect,
 }: {
 	name: string;
-	statement: string;
 	selected: string | null;
 	onSelect: (value: string) => void;
 }) {
 	return (
-		<div className="space-y-4">
-			<p className="text-zinc-700 italic dark:text-zinc-300">“{statement}”</p>
-			<div className="grid grid-cols-2 gap-3">
-				{["True", "False"].map((choice) => {
-					const isSelected = selected === choice;
-					return (
-						<label
-							key={choice}
-							className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected)}`}
-						>
-							<input
-								type="radio"
-								name={name}
-								className="size-4 accent-violet-600"
-								checked={isSelected}
-								onChange={() => onSelect(choice)}
-							/>
-							<span>{choice}</span>
-						</label>
-					);
-				})}
-			</div>
+		<div className="grid grid-cols-2 gap-3">
+			{["True", "False"].map((choice) => {
+				const isSelected = selected === choice;
+				return (
+					<label
+						key={choice}
+						className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected)}`}
+					>
+						<input
+							type="radio"
+							name={name}
+							className="size-4 accent-violet-600"
+							checked={isSelected}
+							onChange={() => onSelect(choice)}
+						/>
+						<span>{choice}</span>
+					</label>
+				);
+			})}
 		</div>
 	);
 }

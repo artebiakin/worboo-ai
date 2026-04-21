@@ -55,7 +55,6 @@ export const MOCK_WORKBOOK: Workbook = {
 				},
 				{
 					kind: "trueFalse",
-					prompt: "True or false?",
 					statement: "Mia went out on Sunday morning.",
 					correctAnswer: false,
 					correction: "Mia didn't go out on Sunday morning.",

@@ -32,7 +32,7 @@ export function FillBlankBlock({ exercise }: FillBlankBlockProps) {
 			instructions={exercise.instructions}
 			headerRight={<StatusPill answered={allFilled} />}
 		>
-			<p className="text-xl leading-relaxed text-zinc-950 dark:text-white">
+			<p className="exercise-focal">
 				{segments.map((segment, i) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: segments are positional slices of a fixed sentence template; order never changes
 					<Fragment key={i}>

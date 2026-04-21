@@ -34,11 +34,11 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 			instructions={exercise.instructions}
 			headerRight={<StatusPill answered={allAnswered} />}
 		>
-			<div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:gap-x-10">
-				<p className="border-b border-zinc-950/10 pb-2 text-xs font-medium tracking-wider text-zinc-500 uppercase dark:border-white/10 dark:text-zinc-400">
+			<div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:gap-x-10">
+				<p className="exercise-label border-b border-zinc-950/10 pb-2 dark:border-white/10">
 					{exercise.leftLabel}
 				</p>
-				<p className="border-b border-zinc-950/10 pb-2 text-xs font-medium tracking-wider text-zinc-500 uppercase dark:border-white/10 dark:text-zinc-400">
+				<p className="exercise-label border-b border-zinc-950/10 pb-2 dark:border-white/10">
 					{exercise.rightLabel}
 				</p>
 
@@ -48,9 +48,7 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 							<span className="text-xs font-medium text-zinc-400 tabular-nums dark:text-zinc-500">
 								{pad2(i + 1)}
 							</span>
-							<span className="text-base text-zinc-950 dark:text-white">
-								{pair.left}
-							</span>
+							<span className="exercise-supporting">{pair.left}</span>
 							<ArrowRight className="size-4 text-zinc-400 dark:text-zinc-500" />
 						</div>
 						<div className="py-1">

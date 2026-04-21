@@ -20,9 +20,7 @@ export function MultipleChoiceBlock({ exercise }: MultipleChoiceBlockProps) {
 			headerRight={<StatusPill answered={answer !== null} />}
 		>
 			<div className="space-y-5">
-				<p className="font-display text-2xl font-semibold tracking-tight text-zinc-950 dark:text-white">
-					{exercise.prompt}
-				</p>
+				<p className="exercise-focal">{exercise.prompt}</p>
 				<MultipleChoiceOptions
 					name={`mc-${exercise.id}`}
 					options={exercise.options}

@@ -45,7 +45,6 @@ export type ReadingQuestion =
 	  }
 	| ({
 			kind: "trueFalse";
-			prompt: string;
 			statement: string;
 			canonicalExplanation: string;
 	  } & TrueFalseAnswer);

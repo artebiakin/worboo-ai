@@ -22,9 +22,7 @@ export function TrueFalseBlock({ exercise }: TrueFalseBlockProps) {
 			headerRight={<StatusPill answered={answer !== null} />}
 		>
 			<div className="space-y-5">
-				<p className="text-2xl text-zinc-950 italic dark:text-white">
-					“{exercise.statement}”
-				</p>
+				<p className="exercise-focal">“{exercise.statement}”</p>
 				<div className="grid grid-cols-2 gap-3">
 					<TrueFalseOption
 						label="True"
