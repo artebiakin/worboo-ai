@@ -1,4 +1,4 @@
-import type { Workbook } from "./mock-workbook";
+import type { Workbook } from "#/domain/workbook";
 
 interface WorkbookIntroProps {
 	workbook: Workbook;

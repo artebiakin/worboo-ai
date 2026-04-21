@@ -1,5 +1,5 @@
 import { BookOpen } from "lucide-react";
-import type { Workbook } from "./mock-workbook";
+import type { Workbook } from "#/domain/workbook";
 
 interface WorkbookHeaderProps {
 	workbook: Workbook;

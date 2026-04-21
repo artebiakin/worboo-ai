@@ -1,4 +1,4 @@
-import type { MultipleChoiceOption } from "./mock-workbook";
+import type { MultipleChoiceOption } from "#/domain/workbook";
 import { optionCardStyle } from "./option-card-style";
 
 interface MultipleChoiceOptionsProps {

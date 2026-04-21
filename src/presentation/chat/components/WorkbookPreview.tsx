@@ -1,9 +1,9 @@
 import { Bookmark, Download, Eye, RefreshCw } from "lucide-react";
+import type { Exercise, Workbook } from "#/domain/workbook";
 import { Button } from "#/presentation/components/catalyst/button";
 import { FillBlankBlock } from "./FillBlankBlock";
 import { MatchingBlock } from "./MatchingBlock";
 import { MultipleChoiceBlock } from "./MultipleChoiceBlock";
-import type { Exercise, Workbook } from "./mock-workbook";
 import { ReadingBlock } from "./ReadingBlock";
 import { TrueFalseBlock } from "./TrueFalseBlock";
 import { WorkbookHeader } from "./WorkbookHeader";

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Exercise } from "./mock-workbook";
+import type { Exercise } from "#/domain/workbook";
 
 type ExerciseKind = Exercise["kind"];
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
+import type { Exercise } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
-import type { Exercise } from "./mock-workbook";
 import { StatusPill } from "./StatusPill";
 
 type MultipleChoiceExercise = Extract<Exercise, { kind: "multipleChoice" }>;

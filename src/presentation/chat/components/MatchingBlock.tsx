@@ -1,7 +1,7 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { Exercise } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
-import type { Exercise } from "./mock-workbook";
 import { StatusPill } from "./StatusPill";
 
 type MatchingExercise = Extract<Exercise, { kind: "matching" }>;

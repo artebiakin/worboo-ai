@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
+import { type Exercise, FILL_BLANK_PLACEHOLDER } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
-import { type Exercise, FILL_BLANK_PLACEHOLDER } from "./mock-workbook";
 import { StatusPill } from "./StatusPill";
 
 type FillBlankExercise = Extract<Exercise, { kind: "fillBlank" }>;

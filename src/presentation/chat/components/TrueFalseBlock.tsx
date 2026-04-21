@@ -1,7 +1,7 @@
 import { Check, X } from "lucide-react";
 import { useState } from "react";
+import type { Exercise } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
-import type { Exercise } from "./mock-workbook";
 import { optionCardStyle } from "./option-card-style";
 import { StatusPill } from "./StatusPill";
 
