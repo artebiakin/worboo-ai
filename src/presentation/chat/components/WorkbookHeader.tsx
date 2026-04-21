@@ -13,7 +13,7 @@ export function WorkbookHeader({ workbook }: WorkbookHeaderProps) {
 			</div>
 			<div>
 				<p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-					{workbook.topic} · {workbook.language}
+					{workbook.topic} · {workbook.level} {workbook.targetLanguage}
 				</p>
 				<h1 className="mt-1 font-display text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
 					{workbook.title}

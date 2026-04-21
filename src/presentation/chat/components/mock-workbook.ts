@@ -86,6 +86,7 @@ export type Exercise =
 export type SkillFocus = "grammar" | "vocabulary" | "reading" | "mixed";
 export type AgeGroup = "children" | "teenagers" | "adults";
 export type DifficultyDistribution = "progressive" | "uniform";
+export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export interface WorkbookReasoning {
 	detectedLanguage: string;
@@ -101,7 +102,8 @@ export interface WorkbookReasoning {
 
 export interface Workbook {
 	topic: string;
-	language: string;
+	targetLanguage: string;
+	level: CefrLevel;
 	title: string;
 	tags: string[];
 	intro: string;
@@ -113,7 +115,8 @@ export interface Workbook {
 
 export const MOCK_WORKBOOK: Workbook = {
 	topic: "Past simple",
-	language: "A2 English",
+	targetLanguage: "English",
+	level: "A2",
 	title: "My Weekend",
 	tags: ["A2 · Elementary", "8 exercises", "≈ 30 minutes", "Ages 13–17"],
 	intro: "Let's practise talking about the past.",
