@@ -13,7 +13,8 @@ interface MatchingBlockProps {
 export function MatchingBlock({ exercise }: MatchingBlockProps) {
 	const [answers, setAnswers] = useState<Record<number, string>>({});
 	const answeredCount = Object.values(answers).filter((v) => v !== "").length;
-	const allAnswered = answeredCount === exercise.items.length;
+	const allAnswered = answeredCount === exercise.pairs.length;
+	const rightOptions = exercise.pairs.map((p) => p.right);
 
 	function setAnswer(index: number, value: string) {
 		setAnswers((prev) => ({ ...prev, [index]: value }));
@@ -34,14 +35,14 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 					{exercise.rightLabel}
 				</p>
 
-				{exercise.items.map((item, i) => (
-					<div key={item} className="contents">
+				{exercise.pairs.map((pair, i) => (
+					<div key={pair.left} className="contents">
 						<div className="flex items-center gap-3 py-1">
 							<span className="text-xs font-medium text-zinc-400 tabular-nums dark:text-zinc-500">
 								{pad2(i + 1)}
 							</span>
 							<span className="text-base text-zinc-950 dark:text-white">
-								{item}
+								{pair.left}
 							</span>
 							<ArrowRight className="size-4 text-zinc-400 dark:text-zinc-500" />
 						</div>
@@ -55,7 +56,7 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 									<option value="" disabled>
 										Select…
 									</option>
-									{exercise.options.map((opt) => (
+									{rightOptions.map((opt) => (
 										<option key={opt} value={opt}>
 											{opt}
 										</option>

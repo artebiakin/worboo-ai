@@ -11,13 +11,28 @@ export interface MultipleChoiceOption {
 	explanationIfChosen: string;
 }
 
+export interface TrueFalseAnswer {
+	correctAnswer: boolean;
+	explanationIfTrue: string;
+	explanationIfFalse: string;
+}
+
+export interface MatchingPair {
+	left: string;
+	right: string;
+}
+
 export type ReadingQuestion =
 	| {
 			kind: "multiple-choice";
 			prompt: string;
 			options: MultipleChoiceOption[];
 	  }
-	| { kind: "true-false"; prompt: string; statement: string };
+	| ({
+			kind: "true-false";
+			prompt: string;
+			statement: string;
+	  } & TrueFalseAnswer);
 
 export type Exercise =
 	| (ExerciseBase & {
@@ -33,19 +48,20 @@ export type Exercise =
 	| (ExerciseBase & {
 			kind: "true-false";
 			statement: string;
-	  })
+	  } & TrueFalseAnswer)
 	| (ExerciseBase & {
 			kind: "fill-blank";
 			prefix: string;
 			hint: string;
 			suffix: string;
+			acceptedAnswers: string[];
+			explanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "matching";
 			leftLabel: string;
 			rightLabel: string;
-			items: string[];
-			options: string[];
+			pairs: MatchingPair[];
 	  });
 
 export interface Workbook {
@@ -114,6 +130,11 @@ export const MOCK_WORKBOOK: Workbook = {
 					kind: "true-false",
 					prompt: "True or false?",
 					statement: "Mia went out on Sunday morning.",
+					correctAnswer: false,
+					explanationIfTrue:
+						"Re-read the text: 'On Sunday morning, Mia didn't go out.' She stayed at home.",
+					explanationIfFalse:
+						"Correct! The text says 'Mia didn't go out' on Sunday morning — she stayed home and read a book.",
 				},
 				{
 					kind: "multiple-choice",
@@ -180,6 +201,11 @@ export const MOCK_WORKBOOK: Workbook = {
 			type: "True or false",
 			kind: "true-false",
 			statement: "I goed to the beach last weekend.",
+			correctAnswer: false,
+			explanationIfTrue:
+				"'goed' isn't a real English form. 'Go' is irregular — the past simple is 'went'.",
+			explanationIfFalse:
+				"Correct! 'Go' is irregular, so the past simple is 'went', not 'goed'.",
 		},
 		{
 			number: "04",
@@ -191,6 +217,9 @@ export const MOCK_WORKBOOK: Workbook = {
 			prefix: "On Friday evening, we",
 			hint: "eat",
 			suffix: "pizza at home.",
+			acceptedAnswers: ["ate"],
+			explanation:
+				"'Eat' is irregular — the past simple is 'ate'. The time marker 'On Friday evening' signals the past.",
 		},
 		{
 			number: "05",
@@ -201,8 +230,14 @@ export const MOCK_WORKBOOK: Workbook = {
 			kind: "matching",
 			leftLabel: "Base form",
 			rightLabel: "Past simple",
-			items: ["go", "have", "do", "see", "buy", "take"],
-			options: ["went", "had", "did", "saw", "bought", "took"],
+			pairs: [
+				{ left: "go", right: "went" },
+				{ left: "have", right: "had" },
+				{ left: "do", right: "did" },
+				{ left: "see", right: "saw" },
+				{ left: "buy", right: "bought" },
+				{ left: "take", right: "took" },
+			],
 		},
 		{
 			number: "06",
@@ -245,6 +280,9 @@ export const MOCK_WORKBOOK: Workbook = {
 			prefix: "Last Saturday morning, I",
 			hint: "wake up",
 			suffix: "at ten o'clock.",
+			acceptedAnswers: ["woke up"],
+			explanation:
+				"'Wake' is irregular: the past simple is 'woke', so 'wake up' becomes 'woke up'.",
 		},
 		{
 			number: "08",
@@ -252,6 +290,11 @@ export const MOCK_WORKBOOK: Workbook = {
 			type: "True or false",
 			kind: "true-false",
 			statement: "The past simple of 'buy' is 'buyed'.",
+			correctAnswer: false,
+			explanationIfTrue:
+				"'buy' is irregular — there's no 'buyed' in English. The past simple is 'bought'.",
+			explanationIfFalse:
+				"Correct! 'Buy' is irregular: the past simple is 'bought'.",
 		},
 	],
 };
