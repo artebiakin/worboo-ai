@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ExerciseCard } from "./ExerciseCard";
 import type { Exercise } from "./mock-workbook";
 import { StatusPill } from "./StatusPill";
@@ -14,7 +14,14 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 	const [answers, setAnswers] = useState<Record<number, string>>({});
 	const answeredCount = Object.values(answers).filter((v) => v !== "").length;
 	const allAnswered = answeredCount === exercise.pairs.length;
-	const rightOptions = exercise.pairs.map((p) => p.right);
+	const rightOptions = useMemo(
+		() =>
+			shuffleDeterministic(
+				exercise.pairs.map((p) => p.right),
+				exercise.number,
+			),
+		[exercise.pairs, exercise.number],
+	);
 
 	function setAnswer(index: number, value: string) {
 		setAnswers((prev) => ({ ...prev, [index]: value }));
@@ -74,4 +81,20 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 
 function pad2(n: number): string {
 	return n.toString().padStart(2, "0");
+}
+
+function shuffleDeterministic<T>(items: T[], seed: string): T[] {
+	return items
+		.map((item, i) => ({ item, key: fnv1a(`${seed}:${i}`) }))
+		.sort((a, b) => a.key - b.key)
+		.map(({ item }) => item);
+}
+
+function fnv1a(s: string): number {
+	let h = 2166136261;
+	for (let i = 0; i < s.length; i++) {
+		h ^= s.charCodeAt(i);
+		h = Math.imul(h, 16777619);
+	}
+	return h >>> 0;
 }
