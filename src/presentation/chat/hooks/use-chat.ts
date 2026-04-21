@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 
-export type ChatPhase = "composer" | "progress" | "questions";
+export type ChatPhase =
+	| "composer"
+	| "analyzing"
+	| "questions"
+	| "building"
+	| "preview";
 
 export function useChat({
 	chatId,
@@ -11,10 +16,17 @@ export function useChat({
 }) {
 	const [composerValue, setComposerValue] = useState("");
 	const [prompt, setPrompt] = useState<string | null>(initialPrompt ?? null);
-	const progress = useFakeProgress(prompt !== null);
+	const [generateStarted, setGenerateStarted] = useState(false);
 
-	const phase: ChatPhase =
-		prompt === null ? "composer" : progress >= 100 ? "questions" : "progress";
+	const analysisPercent = useFakeProgress(prompt !== null && !generateStarted);
+	const buildPercent = useFakeProgress(generateStarted);
+
+	const phase = derivePhase({
+		prompt,
+		generateStarted,
+		analysisPercent,
+		buildPercent,
+	});
 
 	function handleSubmitComposer(e: React.FormEvent) {
 		e.preventDefault();
@@ -24,16 +36,39 @@ export function useChat({
 		setComposerValue("");
 	}
 
+	function handleGenerate() {
+		setGenerateStarted(true);
+	}
+
 	return {
 		chatId,
 		phase,
 		prompt,
-		progress,
+		analysisPercent,
+		buildPercent,
 		composerValue,
 		setComposerValue,
 		canSubmitComposer: composerValue.trim().length > 0,
 		handleSubmitComposer,
+		handleGenerate,
 	};
+}
+
+function derivePhase({
+	prompt,
+	generateStarted,
+	analysisPercent,
+	buildPercent,
+}: {
+	prompt: string | null;
+	generateStarted: boolean;
+	analysisPercent: number;
+	buildPercent: number;
+}): ChatPhase {
+	if (prompt === null) return "composer";
+	if (!generateStarted)
+		return analysisPercent >= 100 ? "questions" : "analyzing";
+	return buildPercent >= 100 ? "preview" : "building";
 }
 
 function useFakeProgress(active: boolean): number {
@@ -49,7 +84,7 @@ function useFakeProgress(active: boolean): number {
 				}
 				return p + 1;
 			});
-		}, 150);
+		}, 50);
 		return () => clearInterval(id);
 	}, [active]);
 

@@ -79,7 +79,11 @@ const QUESTIONS: Question[] = [
 
 const BLOCKING_KINDS: QuestionKind[] = ["required", "conflict"];
 
-export function ChatQuestions() {
+interface ChatQuestionsProps {
+	onGenerate: () => void;
+}
+
+export function ChatQuestions({ onGenerate }: ChatQuestionsProps) {
 	const [answers, setAnswers] = useState<Record<string, string>>({});
 
 	const blockingIds = QUESTIONS.filter((q) =>
@@ -109,6 +113,7 @@ export function ChatQuestions() {
 				answered={answeredCount}
 				total={QUESTIONS.length}
 				canSubmit={allBlockingAnswered}
+				onGenerate={onGenerate}
 			/>
 		</div>
 	);
@@ -269,10 +274,12 @@ function QuestionsFooter({
 	answered,
 	total,
 	canSubmit,
+	onGenerate,
 }: {
 	answered: number;
 	total: number;
 	canSubmit: boolean;
+	onGenerate: () => void;
 }) {
 	return (
 		<div className="flex items-center justify-between gap-4 border-t border-zinc-950/10 pt-4 dark:border-white/10">
@@ -287,7 +294,12 @@ function QuestionsFooter({
 					</>
 				)}
 			</p>
-			<Button type="button" color="violet" disabled={!canSubmit}>
+			<Button
+				type="button"
+				color="violet"
+				disabled={!canSubmit}
+				onClick={onGenerate}
+			>
 				Generate workbook
 				<ArrowRight data-slot="icon" />
 			</Button>

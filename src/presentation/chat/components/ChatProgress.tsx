@@ -1,24 +1,27 @@
 import { Check, Loader2 } from "lucide-react";
 
-const STEPS = [
-	{ id: "understanding", label: "Understanding your request" },
-	{ id: "planning", label: "Planning exercises" },
-	{ id: "writing", label: "Writing content" },
-	{ id: "explaining", label: "Adding explanations" },
-] as const;
-
-const STEP_SIZE = 100 / STEPS.length;
+export interface ProgressStep {
+	id: string;
+	label: string;
+}
 
 interface ChatProgressProps {
 	percent: number;
+	steps: readonly ProgressStep[];
+	footerText: string;
 }
 
-export function ChatProgress({ percent }: ChatProgressProps) {
+export function ChatProgress({
+	percent,
+	steps,
+	footerText,
+}: ChatProgressProps) {
+	const stepSize = 100 / steps.length;
 	const currentIndex = Math.min(
-		Math.floor(percent / STEP_SIZE),
-		STEPS.length - 1,
+		Math.floor(percent / stepSize),
+		steps.length - 1,
 	);
-	const current = STEPS[currentIndex];
+	const current = steps[currentIndex];
 
 	return (
 		<>
@@ -43,8 +46,8 @@ export function ChatProgress({ percent }: ChatProgressProps) {
 				</div>
 
 				<ol className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold tracking-wider uppercase">
-					{STEPS.map((step, i) => {
-						const state = stepState(i, percent);
+					{steps.map((step, i) => {
+						const state = stepState(i, percent, stepSize);
 						return (
 							<li key={step.id} className="flex items-center gap-1.5">
 								<StepMarker state={state} />
@@ -68,15 +71,19 @@ export function ChatProgress({ percent }: ChatProgressProps) {
 			<GeneratingPreview />
 
 			<p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-				Creating your lesson. This usually takes 10–20 seconds.
+				{footerText}
 			</p>
 		</>
 	);
 }
 
-function stepState(i: number, percent: number): "done" | "current" | "pending" {
-	const start = i * STEP_SIZE;
-	const end = (i + 1) * STEP_SIZE;
+function stepState(
+	i: number,
+	percent: number,
+	stepSize: number,
+): "done" | "current" | "pending" {
+	const start = i * stepSize;
+	const end = (i + 1) * stepSize;
 	if (percent >= end) return "done";
 	if (percent >= start) return "current";
 	return "pending";
