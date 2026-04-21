@@ -98,12 +98,11 @@ export const MOCK_WORKBOOK: Workbook = {
 	language: "A2 English",
 	title: "My Weekend",
 	tags: ["A2 · Elementary", "8 exercises", "≈ 30 minutes", "Ages 13–17"],
-	intro:
-		"In this lesson, students practise the past simple through the context of weekend activities. They review regular and irregular verbs, form affirmative and negative sentences, and ask simple questions about the past.",
+	intro: "Let's practise talking about the past.",
 	objectives: [
-		"Form affirmative and negative past simple sentences",
-		"Use common irregular verbs (went, had, saw, did)",
-		"Ask and answer Yes/No questions about the past",
+		"form affirmative and negative past simple sentences",
+		"use common irregular verbs (went, had, saw, did)",
+		"ask and answer Yes/No questions about the past",
 	],
 	exercises: [
 		{
