@@ -29,6 +29,14 @@ export interface MatchingPair {
 	right: string;
 }
 
+export interface FillBlank {
+	hint: string;
+	acceptedAnswers: string[];
+	explanation: string;
+}
+
+export const FILL_BLANK_PLACEHOLDER = "{{blank}}";
+
 export type ReadingQuestion =
 	| {
 			kind: "multiple-choice";
@@ -63,11 +71,8 @@ export type Exercise =
 	  } & TrueFalseAnswer)
 	| (ExerciseBase & {
 			kind: "fill-blank";
-			prefix: string;
-			hint: string;
-			suffix: string;
-			acceptedAnswers: string[];
-			blankExplanation: string;
+			sentence: string;
+			blanks: FillBlank[];
 			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
@@ -240,16 +245,25 @@ export const MOCK_WORKBOOK: Workbook = {
 			title: "Fill in the blank",
 			type: "Fill in the blank",
 			instructions:
-				"Complete the sentence with the past simple of the verb in parentheses.",
+				"Complete each blank with the past simple of the verb in parentheses.",
 			kind: "fill-blank",
-			prefix: "On Friday evening, we",
-			hint: "eat",
-			suffix: "pizza at home.",
-			acceptedAnswers: ["ate"],
-			blankExplanation:
-				"The past simple of 'eat' is 'ate'. 'On Friday evening' is a past time marker.",
+			sentence: "On Friday night, we {{blank}} a film and {{blank}} pizza.",
+			blanks: [
+				{
+					hint: "watch",
+					acceptedAnswers: ["watched"],
+					explanation:
+						"'Watch' is regular: past simple = watch + -ed → 'watched'.",
+				},
+				{
+					hint: "eat",
+					acceptedAnswers: ["ate"],
+					explanation:
+						"'Eat' is irregular: past simple is 'ate' (not 'eated').",
+				},
+			],
 			canonicalExplanation:
-				"'Eat' is irregular: past simple is 'ate', past participle 'eaten'. Regular -ed endings don't apply here.",
+				"Two past-simple verbs in one sentence: 'watch' is regular (+ -ed), 'eat' is irregular ('ate'). 'On Friday night' anchors both actions in the past.",
 		},
 		{
 			number: "05",
@@ -311,12 +325,15 @@ export const MOCK_WORKBOOK: Workbook = {
 			title: "My last weekend",
 			type: "Fill in the blank",
 			kind: "fill-blank",
-			prefix: "Last Saturday morning, I",
-			hint: "wake up",
-			suffix: "at ten o'clock.",
-			acceptedAnswers: ["woke up"],
-			blankExplanation:
-				"The past simple of 'wake up' is 'woke up'. 'Last Saturday morning' signals the past.",
+			sentence: "Last Saturday morning, I {{blank}} at ten o'clock.",
+			blanks: [
+				{
+					hint: "wake up",
+					acceptedAnswers: ["woke up"],
+					explanation:
+						"The past simple of 'wake up' is 'woke up'. 'Last Saturday morning' signals the past.",
+				},
+			],
 			canonicalExplanation:
 				"'Wake' is irregular: past simple 'woke'. In a phrasal verb like 'wake up', only the main verb changes — the particle stays.",
 		},
