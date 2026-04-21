@@ -1,16 +1,24 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Exercise } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
+import { ExplanationPanel } from "./ExplanationPanel";
+import type { ReportScore } from "./exercise-reveal";
 import { StatusPill } from "./StatusPill";
 
 type MatchingExercise = Extract<Exercise, { kind: "matching" }>;
 
 interface MatchingBlockProps {
 	exercise: MatchingExercise;
+	revealed: boolean;
+	onScoreChange?: ReportScore;
 }
 
-export function MatchingBlock({ exercise }: MatchingBlockProps) {
+export function MatchingBlock({
+	exercise,
+	revealed,
+	onScoreChange,
+}: MatchingBlockProps) {
 	const [answers, setAnswers] = useState<Record<number, string>>({});
 	const answeredCount = Object.values(answers).filter((v) => v !== "").length;
 	const allAnswered = answeredCount === exercise.pairs.length;
@@ -22,6 +30,14 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 			),
 		[exercise.pairs, exercise.id],
 	);
+	const correct = exercise.pairs.reduce((acc, pair, i) => {
+		return answers[i] === pair.right ? acc + 1 : acc;
+	}, 0);
+	const total = exercise.pairs.length;
+
+	useEffect(() => {
+		onScoreChange?.(exercise.id, { correct, total });
+	}, [exercise.id, correct, total, onScoreChange]);
 
 	function setAnswer(index: number, value: string) {
 		setAnswers((prev) => ({ ...prev, [index]: value }));
@@ -73,6 +89,27 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 					</div>
 				))}
 			</div>
+			{revealed ? (
+				<ExplanationPanel>
+					<ul className="space-y-1">
+						{exercise.pairs.map((pair) => (
+							<li
+								key={pair.left}
+								className="flex flex-wrap items-center gap-2 text-sm"
+							>
+								<span>{pair.left}</span>
+								<ArrowRight className="size-3.5 text-zinc-400 dark:text-zinc-500" />
+								<span className="font-medium text-zinc-900 dark:text-zinc-100">
+									{pair.right}
+								</span>
+							</li>
+						))}
+					</ul>
+					<p className="mt-3 border-t border-violet-500/20 pt-3 dark:border-violet-400/20">
+						{exercise.canonicalExplanation}
+					</p>
+				</ExplanationPanel>
+			) : null}
 		</ExerciseCard>
 	);
 }
