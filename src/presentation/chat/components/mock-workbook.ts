@@ -1,5 +1,5 @@
 interface ExerciseBase {
-	number: string;
+	id: number;
 	title: string;
 	type: string;
 	instructions?: string;
@@ -124,7 +124,7 @@ export const MOCK_WORKBOOK: Workbook = {
 	],
 	exercises: [
 		{
-			number: "01",
+			id: 1,
 			title: "Mia's Weekend",
 			type: "Reading",
 			instructions:
@@ -214,7 +214,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"This reading checks comprehension of a past-tense narrative. Track time markers ('Last Saturday', 'On Sunday morning', 'In the afternoon') and who does each action.",
 		},
 		{
-			number: "02",
+			id: 2,
 			title: "Multiple choice",
 			type: "Multiple choice",
 			kind: "multiple-choice",
@@ -243,7 +243,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"Past simple of a regular verb: base + -ed. 'Last night' is a time marker that fixes the action in the past.",
 		},
 		{
-			number: "03",
+			id: 3,
 			title: "True or false",
 			type: "True or false",
 			kind: "true-false",
@@ -258,7 +258,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"'Go' is one of the most common irregular verbs. Its past simple is 'went' — the -ed rule does not apply.",
 		},
 		{
-			number: "04",
+			id: 4,
 			title: "Fill in the blank",
 			type: "Fill in the blank",
 			instructions:
@@ -283,7 +283,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"Two past-simple verbs in one sentence: 'watch' is regular (+ -ed), 'eat' is irregular ('ate'). 'On Friday night' anchors both actions in the past.",
 		},
 		{
-			number: "05",
+			id: 5,
 			title: "Match the verb forms",
 			type: "Matching",
 			instructions:
@@ -303,7 +303,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"High-frequency irregular past forms to memorise: go/went, have/had, do/did, see/saw, buy/bought, take/took.",
 		},
 		{
-			number: "06",
+			id: 6,
 			title: "Choose the question",
 			type: "Multiple choice",
 			kind: "multiple-choice",
@@ -338,7 +338,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"Past simple questions are formed with 'did' + subject + base verb. The auxiliary 'did' carries the tense; the main verb stays in its base form.",
 		},
 		{
-			number: "07",
+			id: 7,
 			title: "My last weekend",
 			type: "Fill in the blank",
 			kind: "fill-blank",
@@ -355,7 +355,7 @@ export const MOCK_WORKBOOK: Workbook = {
 				"'Wake' is irregular: past simple 'woke'. In a phrasal verb like 'wake up', only the main verb changes — the particle stays.",
 		},
 		{
-			number: "08",
+			id: 8,
 			title: "Quick check",
 			type: "True or false",
 			kind: "true-false",

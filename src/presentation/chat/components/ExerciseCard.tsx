@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 interface ExerciseCardProps {
-	number: string;
+	id: number;
 	type: string;
 	instructions?: string;
 	headerRight?: ReactNode;
@@ -9,7 +9,7 @@ interface ExerciseCardProps {
 }
 
 export function ExerciseCard({
-	number,
+	id,
 	type,
 	instructions,
 	headerRight,
@@ -20,7 +20,7 @@ export function ExerciseCard({
 			<header className="space-y-2">
 				<div className="flex items-start justify-between gap-4">
 					<p className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-						Exercise {number} · {type}
+						Exercise {id.toString().padStart(2, "0")} · {type}
 					</p>
 					{headerRight}
 				</div>

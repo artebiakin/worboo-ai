@@ -14,7 +14,7 @@ interface ReadingBlockProps {
 export function ReadingBlock({ exercise }: ReadingBlockProps) {
 	return (
 		<ExerciseCard
-			number={exercise.number}
+			id={exercise.id}
 			type={exercise.type}
 			instructions={exercise.instructions}
 		>
@@ -30,7 +30,7 @@ export function ReadingBlock({ exercise }: ReadingBlockProps) {
 			<ol className="divide-y divide-zinc-950/10 dark:divide-white/10">
 				{exercise.questions.map((q, i) => {
 					const letter = String.fromCharCode(65 + i);
-					const label = `Question ${Number.parseInt(exercise.number, 10)}${letter}`;
+					const label = `Question ${exercise.id}${letter}`;
 					return (
 						<li
 							key={`${label}-${q.prompt}`}

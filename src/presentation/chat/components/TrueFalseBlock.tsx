@@ -16,7 +16,7 @@ export function TrueFalseBlock({ exercise }: TrueFalseBlockProps) {
 
 	return (
 		<ExerciseCard
-			number={exercise.number}
+			id={exercise.id}
 			type={exercise.type}
 			instructions={exercise.instructions}
 			headerRight={<StatusPill answered={answer !== null} />}

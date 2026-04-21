@@ -18,9 +18,9 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 		() =>
 			shuffleDeterministic(
 				exercise.pairs.map((p) => p.right),
-				exercise.number,
+				String(exercise.id),
 			),
-		[exercise.pairs, exercise.number],
+		[exercise.pairs, exercise.id],
 	);
 
 	function setAnswer(index: number, value: string) {
@@ -29,7 +29,7 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 
 	return (
 		<ExerciseCard
-			number={exercise.number}
+			id={exercise.id}
 			type={exercise.type}
 			instructions={exercise.instructions}
 			headerRight={<StatusPill answered={allAnswered} />}

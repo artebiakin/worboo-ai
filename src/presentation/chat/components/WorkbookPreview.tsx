@@ -23,7 +23,7 @@ export function WorkbookPreview({ workbook }: WorkbookPreviewProps) {
 			<WorkbookIntro workbook={workbook} />
 
 			{workbook.exercises.map((exercise) => (
-				<ExerciseBlock key={exercise.number} exercise={exercise} />
+				<ExerciseBlock key={exercise.id} exercise={exercise} />
 			))}
 		</div>
 	);

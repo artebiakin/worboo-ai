@@ -15,7 +15,7 @@ export function MultipleChoiceBlock({ exercise }: MultipleChoiceBlockProps) {
 
 	return (
 		<ExerciseCard
-			number={exercise.number}
+			id={exercise.id}
 			type={exercise.type}
 			headerRight={<StatusPill answered={answer !== null} />}
 		>
@@ -24,7 +24,7 @@ export function MultipleChoiceBlock({ exercise }: MultipleChoiceBlockProps) {
 					{exercise.prompt}
 				</p>
 				<MultipleChoiceOptions
-					name={`mc-${exercise.number}`}
+					name={`mc-${exercise.id}`}
 					options={exercise.options}
 					selected={answer}
 					onSelect={setAnswer}
