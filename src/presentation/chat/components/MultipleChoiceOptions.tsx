@@ -1,8 +1,9 @@
+import type { MultipleChoiceOption } from "./mock-workbook";
 import { optionCardStyle } from "./option-card-style";
 
 interface MultipleChoiceOptionsProps {
 	name: string;
-	options: string[];
+	options: MultipleChoiceOption[];
 	selected: string | null;
 	onSelect: (value: string) => void;
 }
@@ -17,9 +18,9 @@ export function MultipleChoiceOptions({
 		<ul className="space-y-2">
 			{options.map((opt, i) => {
 				const letter = String.fromCharCode(65 + i);
-				const isSelected = selected === opt;
+				const isSelected = selected === opt.text;
 				return (
-					<li key={opt}>
+					<li key={opt.text}>
 						<label
 							className={`flex items-center gap-4 rounded-lg border px-5 py-3 ${optionCardStyle(isSelected)}`}
 						>
@@ -28,12 +29,12 @@ export function MultipleChoiceOptions({
 								name={name}
 								className="size-4 accent-violet-600"
 								checked={isSelected}
-								onChange={() => onSelect(opt)}
+								onChange={() => onSelect(opt.text)}
 							/>
 							<span className="w-4 text-xs font-medium text-zinc-400 dark:text-zinc-500">
 								{letter}
 							</span>
-							<span>{opt}</span>
+							<span>{opt.text}</span>
 						</label>
 					</li>
 				);

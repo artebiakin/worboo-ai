@@ -5,8 +5,18 @@ interface ExerciseBase {
 	instructions?: string;
 }
 
+export interface MultipleChoiceOption {
+	text: string;
+	isCorrect: boolean;
+	explanationIfChosen: string;
+}
+
 export type ReadingQuestion =
-	| { kind: "multiple-choice"; prompt: string; options: string[] }
+	| {
+			kind: "multiple-choice";
+			prompt: string;
+			options: MultipleChoiceOption[];
+	  }
 	| { kind: "true-false"; prompt: string; statement: string };
 
 export type Exercise =
@@ -18,7 +28,7 @@ export type Exercise =
 	| (ExerciseBase & {
 			kind: "multiple-choice";
 			prompt: string;
-			options: string[];
+			options: MultipleChoiceOption[];
 	  })
 	| (ExerciseBase & {
 			kind: "true-false";
@@ -74,10 +84,30 @@ export const MOCK_WORKBOOK: Workbook = {
 					kind: "multiple-choice",
 					prompt: "Where did Mia go on Saturday?",
 					options: [
-						"to the park",
-						"to the cinema",
-						"to a restaurant",
-						"to her grandmother's house",
+						{
+							text: "to the park",
+							isCorrect: false,
+							explanationIfChosen:
+								"Not quite — the park isn't mentioned in the text. Re-read the first sentence.",
+						},
+						{
+							text: "to the cinema",
+							isCorrect: true,
+							explanationIfChosen:
+								"Correct! The text says 'Mia went to the cinema with her brother.'",
+						},
+						{
+							text: "to a restaurant",
+							isCorrect: false,
+							explanationIfChosen:
+								"She did eat pizza at a restaurant, but that was *after* the film — not where she went first.",
+						},
+						{
+							text: "to her grandmother's house",
+							isCorrect: false,
+							explanationIfChosen:
+								"Her grandmother visited *her* on Sunday afternoon; Mia didn't go to grandma's house.",
+						},
 					],
 				},
 				{
@@ -89,10 +119,30 @@ export const MOCK_WORKBOOK: Workbook = {
 					kind: "multiple-choice",
 					prompt: "What did Mia and her grandmother do together?",
 					options: [
-						"watched a film",
-						"ate pizza",
-						"baked a cake",
-						"read a book",
+						{
+							text: "watched a film",
+							isCorrect: false,
+							explanationIfChosen:
+								"Mia watched the film with her brother on Saturday, not with her grandmother.",
+						},
+						{
+							text: "ate pizza",
+							isCorrect: false,
+							explanationIfChosen:
+								"The pizza was eaten with her brother after the film — grandma wasn't there.",
+						},
+						{
+							text: "baked a cake",
+							isCorrect: true,
+							explanationIfChosen:
+								"Correct! The text says 'her grandmother visited and they made a cake together.'",
+						},
+						{
+							text: "read a book",
+							isCorrect: false,
+							explanationIfChosen:
+								"Mia read the book alone on Sunday morning, before her grandmother arrived.",
+						},
 					],
 				},
 			],
@@ -103,7 +153,26 @@ export const MOCK_WORKBOOK: Workbook = {
 			type: "Multiple choice",
 			kind: "multiple-choice",
 			prompt: "Last night I ___ a great film with my family.",
-			options: ["watch", "watched", "watching"],
+			options: [
+				{
+					text: "watch",
+					isCorrect: false,
+					explanationIfChosen:
+						"'watch' is the base form — you'd use it with 'I watch films every weekend'. Here 'last night' signals the past.",
+				},
+				{
+					text: "watched",
+					isCorrect: true,
+					explanationIfChosen:
+						"Correct! 'Watch' is a regular verb, so the past simple is 'watched'. 'Last night' is the time marker.",
+				},
+				{
+					text: "watching",
+					isCorrect: false,
+					explanationIfChosen:
+						"'watching' is the -ing form, used with 'be' (I was watching). On its own it can't express past simple.",
+				},
+			],
 		},
 		{
 			number: "03",
@@ -142,10 +211,30 @@ export const MOCK_WORKBOOK: Workbook = {
 			kind: "multiple-choice",
 			prompt: "Which question is correctly formed in the Past Simple?",
 			options: [
-				"Did you went to the park?",
-				"Do you go to the park yesterday?",
-				"Did you go to the park?",
-				"Went you to the park?",
+				{
+					text: "Did you went to the park?",
+					isCorrect: false,
+					explanationIfChosen:
+						"After 'did', the main verb stays in its base form. It should be 'Did you *go*…' — only one verb carries the past tense.",
+				},
+				{
+					text: "Do you go to the park yesterday?",
+					isCorrect: false,
+					explanationIfChosen:
+						"'Do' is present simple. With 'yesterday' you need the past auxiliary: 'Did you go…?'",
+				},
+				{
+					text: "Did you go to the park?",
+					isCorrect: true,
+					explanationIfChosen:
+						"Correct! Past simple questions use 'did' + subject + base verb.",
+				},
+				{
+					text: "Went you to the park?",
+					isCorrect: false,
+					explanationIfChosen:
+						"English doesn't invert the main verb to form questions — you need the auxiliary 'did': 'Did you go…?'",
+				},
 			],
 		},
 		{
