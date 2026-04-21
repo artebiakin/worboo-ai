@@ -11,11 +11,18 @@ export interface MultipleChoiceOption {
 	explanationIfChosen: string;
 }
 
-export interface TrueFalseAnswer {
-	correctAnswer: boolean;
-	explanationIfTrue: string;
-	explanationIfFalse: string;
-}
+export type TrueFalseAnswer =
+	| {
+			correctAnswer: true;
+			explanationIfTrue: string;
+			explanationIfFalse: string;
+	  }
+	| {
+			correctAnswer: false;
+			correction: string;
+			explanationIfTrue: string;
+			explanationIfFalse: string;
+	  };
 
 export interface MatchingPair {
 	left: string;
@@ -131,6 +138,7 @@ export const MOCK_WORKBOOK: Workbook = {
 					prompt: "True or false?",
 					statement: "Mia went out on Sunday morning.",
 					correctAnswer: false,
+					correction: "Mia didn't go out on Sunday morning.",
 					explanationIfTrue:
 						"Re-read the text: 'On Sunday morning, Mia didn't go out.' She stayed at home.",
 					explanationIfFalse:
@@ -202,6 +210,7 @@ export const MOCK_WORKBOOK: Workbook = {
 			kind: "true-false",
 			statement: "I goed to the beach last weekend.",
 			correctAnswer: false,
+			correction: "I went to the beach last weekend.",
 			explanationIfTrue:
 				"'goed' isn't a real English form. 'Go' is irregular — the past simple is 'went'.",
 			explanationIfFalse:
@@ -291,6 +300,7 @@ export const MOCK_WORKBOOK: Workbook = {
 			kind: "true-false",
 			statement: "The past simple of 'buy' is 'buyed'.",
 			correctAnswer: false,
+			correction: "The past simple of 'buy' is 'bought'.",
 			explanationIfTrue:
 				"'buy' is irregular — there's no 'buyed' in English. The past simple is 'bought'.",
 			explanationIfFalse:
