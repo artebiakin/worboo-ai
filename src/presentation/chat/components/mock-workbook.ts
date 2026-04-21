@@ -14,14 +14,14 @@ export interface MultipleChoiceOption {
 export type TrueFalseAnswer =
 	| {
 			correctAnswer: true;
-			explanationIfTrue: string;
-			explanationIfFalse: string;
+			explanationIfTrueChosen: string;
+			explanationIfFalseChosen: string;
 	  }
 	| {
 			correctAnswer: false;
 			correction: string;
-			explanationIfTrue: string;
-			explanationIfFalse: string;
+			explanationIfTrueChosen: string;
+			explanationIfFalseChosen: string;
 	  };
 
 export interface MatchingPair {
@@ -34,11 +34,13 @@ export type ReadingQuestion =
 			kind: "multiple-choice";
 			prompt: string;
 			options: MultipleChoiceOption[];
+			canonicalExplanation: string;
 	  }
 	| ({
 			kind: "true-false";
 			prompt: string;
 			statement: string;
+			canonicalExplanation: string;
 	  } & TrueFalseAnswer);
 
 export type Exercise =
@@ -46,15 +48,18 @@ export type Exercise =
 			kind: "reading";
 			text: string;
 			questions: ReadingQuestion[];
+			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "multiple-choice";
 			prompt: string;
 			options: MultipleChoiceOption[];
+			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "true-false";
 			statement: string;
+			canonicalExplanation: string;
 	  } & TrueFalseAnswer)
 	| (ExerciseBase & {
 			kind: "fill-blank";
@@ -62,13 +67,15 @@ export type Exercise =
 			hint: string;
 			suffix: string;
 			acceptedAnswers: string[];
-			explanation: string;
+			blankExplanation: string;
+			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "matching";
 			leftLabel: string;
 			rightLabel: string;
 			pairs: MatchingPair[];
+			canonicalExplanation: string;
 	  });
 
 export interface Workbook {
@@ -132,6 +139,8 @@ export const MOCK_WORKBOOK: Workbook = {
 								"Her grandmother visited *her* on Sunday afternoon; Mia didn't go to grandma's house.",
 						},
 					],
+					canonicalExplanation:
+						"Find the Saturday time marker and the action that immediately follows it — the cinema is named in the first sentence.",
 				},
 				{
 					kind: "true-false",
@@ -139,10 +148,12 @@ export const MOCK_WORKBOOK: Workbook = {
 					statement: "Mia went out on Sunday morning.",
 					correctAnswer: false,
 					correction: "Mia didn't go out on Sunday morning.",
-					explanationIfTrue:
+					explanationIfTrueChosen:
 						"Re-read the text: 'On Sunday morning, Mia didn't go out.' She stayed at home.",
-					explanationIfFalse:
+					explanationIfFalseChosen:
 						"Correct! The text says 'Mia didn't go out' on Sunday morning — she stayed home and read a book.",
+					canonicalExplanation:
+						"Watch for negation: 'didn't go out' reverses 'went out'. A single 'not' flips the truth of the whole statement.",
 				},
 				{
 					kind: "multiple-choice",
@@ -173,8 +184,12 @@ export const MOCK_WORKBOOK: Workbook = {
 								"Mia read the book alone on Sunday morning, before her grandmother arrived.",
 						},
 					],
+					canonicalExplanation:
+						"Filter for actions where *both* Mia and her grandmother are the actors — only the cake-making fits.",
 				},
 			],
+			canonicalExplanation:
+				"This reading checks comprehension of a past-tense narrative. Track time markers ('Last Saturday', 'On Sunday morning', 'In the afternoon') and who does each action.",
 		},
 		{
 			number: "02",
@@ -202,6 +217,8 @@ export const MOCK_WORKBOOK: Workbook = {
 						"'watching' is the -ing form, used with 'be' (I was watching). On its own it can't express past simple.",
 				},
 			],
+			canonicalExplanation:
+				"Past simple of a regular verb: base + -ed. 'Last night' is a time marker that fixes the action in the past.",
 		},
 		{
 			number: "03",
@@ -211,10 +228,12 @@ export const MOCK_WORKBOOK: Workbook = {
 			statement: "I goed to the beach last weekend.",
 			correctAnswer: false,
 			correction: "I went to the beach last weekend.",
-			explanationIfTrue:
+			explanationIfTrueChosen:
 				"'goed' isn't a real English form. 'Go' is irregular — the past simple is 'went'.",
-			explanationIfFalse:
+			explanationIfFalseChosen:
 				"Correct! 'Go' is irregular, so the past simple is 'went', not 'goed'.",
+			canonicalExplanation:
+				"'Go' is one of the most common irregular verbs. Its past simple is 'went' — the -ed rule does not apply.",
 		},
 		{
 			number: "04",
@@ -227,8 +246,10 @@ export const MOCK_WORKBOOK: Workbook = {
 			hint: "eat",
 			suffix: "pizza at home.",
 			acceptedAnswers: ["ate"],
-			explanation:
-				"'Eat' is irregular — the past simple is 'ate'. The time marker 'On Friday evening' signals the past.",
+			blankExplanation:
+				"The past simple of 'eat' is 'ate'. 'On Friday evening' is a past time marker.",
+			canonicalExplanation:
+				"'Eat' is irregular: past simple is 'ate', past participle 'eaten'. Regular -ed endings don't apply here.",
 		},
 		{
 			number: "05",
@@ -247,6 +268,8 @@ export const MOCK_WORKBOOK: Workbook = {
 				{ left: "buy", right: "bought" },
 				{ left: "take", right: "took" },
 			],
+			canonicalExplanation:
+				"High-frequency irregular past forms to memorise: go/went, have/had, do/did, see/saw, buy/bought, take/took.",
 		},
 		{
 			number: "06",
@@ -280,6 +303,8 @@ export const MOCK_WORKBOOK: Workbook = {
 						"English doesn't invert the main verb to form questions — you need the auxiliary 'did': 'Did you go…?'",
 				},
 			],
+			canonicalExplanation:
+				"Past simple questions are formed with 'did' + subject + base verb. The auxiliary 'did' carries the tense; the main verb stays in its base form.",
 		},
 		{
 			number: "07",
@@ -290,8 +315,10 @@ export const MOCK_WORKBOOK: Workbook = {
 			hint: "wake up",
 			suffix: "at ten o'clock.",
 			acceptedAnswers: ["woke up"],
-			explanation:
-				"'Wake' is irregular: the past simple is 'woke', so 'wake up' becomes 'woke up'.",
+			blankExplanation:
+				"The past simple of 'wake up' is 'woke up'. 'Last Saturday morning' signals the past.",
+			canonicalExplanation:
+				"'Wake' is irregular: past simple 'woke'. In a phrasal verb like 'wake up', only the main verb changes — the particle stays.",
 		},
 		{
 			number: "08",
@@ -301,10 +328,12 @@ export const MOCK_WORKBOOK: Workbook = {
 			statement: "The past simple of 'buy' is 'buyed'.",
 			correctAnswer: false,
 			correction: "The past simple of 'buy' is 'bought'.",
-			explanationIfTrue:
+			explanationIfTrueChosen:
 				"'buy' is irregular — there's no 'buyed' in English. The past simple is 'bought'.",
-			explanationIfFalse:
+			explanationIfFalseChosen:
 				"Correct! 'Buy' is irregular: the past simple is 'bought'.",
+			canonicalExplanation:
+				"'Buy' is irregular: past simple 'bought'. The regular -ed ending doesn't apply to every verb.",
 		},
 	],
 };
