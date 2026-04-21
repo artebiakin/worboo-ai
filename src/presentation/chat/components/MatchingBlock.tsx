@@ -30,7 +30,7 @@ export function MatchingBlock({ exercise }: MatchingBlockProps) {
 	return (
 		<ExerciseCard
 			id={exercise.id}
-			type={exercise.type}
+			kind={exercise.kind}
 			instructions={exercise.instructions}
 			headerRight={<StatusPill answered={allAnswered} />}
 		>

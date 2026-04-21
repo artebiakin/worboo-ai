@@ -15,7 +15,7 @@ export function ReadingBlock({ exercise }: ReadingBlockProps) {
 	return (
 		<ExerciseCard
 			id={exercise.id}
-			type={exercise.type}
+			kind={exercise.kind}
 			instructions={exercise.instructions}
 		>
 			<blockquote className="space-y-3 border-l-4 border-zinc-950/20 pl-6 dark:border-white/20">

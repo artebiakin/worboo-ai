@@ -16,7 +16,7 @@ export function MultipleChoiceBlock({ exercise }: MultipleChoiceBlockProps) {
 	return (
 		<ExerciseCard
 			id={exercise.id}
-			type={exercise.type}
+			kind={exercise.kind}
 			headerRight={<StatusPill answered={answer !== null} />}
 		>
 			<div className="space-y-5">

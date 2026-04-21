@@ -1,8 +1,19 @@
 import type { ReactNode } from "react";
+import type { Exercise } from "./mock-workbook";
+
+type ExerciseKind = Exercise["kind"];
+
+const KIND_LABEL: Record<ExerciseKind, string> = {
+	reading: "Reading",
+	"multiple-choice": "Multiple choice",
+	"true-false": "True or false",
+	"fill-blank": "Fill in the blank",
+	matching: "Matching",
+};
 
 interface ExerciseCardProps {
 	id: number;
-	type: string;
+	kind: ExerciseKind;
 	instructions?: string;
 	headerRight?: ReactNode;
 	children: ReactNode;
@@ -10,7 +21,7 @@ interface ExerciseCardProps {
 
 export function ExerciseCard({
 	id,
-	type,
+	kind,
 	instructions,
 	headerRight,
 	children,
@@ -20,7 +31,7 @@ export function ExerciseCard({
 			<header className="space-y-2">
 				<div className="flex items-start justify-between gap-4">
 					<p className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-						Exercise {id.toString().padStart(2, "0")} · {type}
+						Exercise {id.toString().padStart(2, "0")} · {KIND_LABEL[kind]}
 					</p>
 					{headerRight}
 				</div>

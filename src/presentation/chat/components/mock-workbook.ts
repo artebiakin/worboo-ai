@@ -1,7 +1,6 @@
 interface ExerciseBase {
 	id: number;
-	title: string;
-	type: string;
+	title?: string;
 	instructions?: string;
 }
 
@@ -54,6 +53,7 @@ export type ReadingQuestion =
 export type Exercise =
 	| (ExerciseBase & {
 			kind: "reading";
+			title: string;
 			text: string;
 			questions: ReadingQuestion[];
 			canonicalExplanation: string;
@@ -126,7 +126,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		{
 			id: 1,
 			title: "Mia's Weekend",
-			type: "Reading",
 			instructions:
 				"Read the short text about Mia's weekend, then answer the questions.",
 			kind: "reading",
@@ -215,8 +214,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 2,
-			title: "Multiple choice",
-			type: "Multiple choice",
 			kind: "multiple-choice",
 			prompt: "Last night I ___ a great film with my family.",
 			options: [
@@ -244,8 +241,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 3,
-			title: "True or false",
-			type: "True or false",
 			kind: "true-false",
 			statement: "I goed to the beach last weekend.",
 			correctAnswer: false,
@@ -259,8 +254,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 4,
-			title: "Fill in the blank",
-			type: "Fill in the blank",
 			instructions:
 				"Complete each blank with the past simple of the verb in parentheses.",
 			kind: "fill-blank",
@@ -284,8 +277,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 5,
-			title: "Match the verb forms",
-			type: "Matching",
 			instructions:
 				"Match each base verb on the left with its past simple form on the right.",
 			kind: "matching",
@@ -304,8 +295,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 6,
-			title: "Choose the question",
-			type: "Multiple choice",
 			kind: "multiple-choice",
 			prompt: "Which question is correctly formed in the Past Simple?",
 			options: [
@@ -339,8 +328,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 7,
-			title: "My last weekend",
-			type: "Fill in the blank",
 			kind: "fill-blank",
 			sentence: "Last Saturday morning, I {{blank}} at ten o'clock.",
 			blanks: [
@@ -356,8 +343,6 @@ export const MOCK_WORKBOOK: Workbook = {
 		},
 		{
 			id: 8,
-			title: "Quick check",
-			type: "True or false",
 			kind: "true-false",
 			statement: "The past simple of 'buy' is 'buyed'.",
 			correctAnswer: false,
