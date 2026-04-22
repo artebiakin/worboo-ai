@@ -6,117 +6,92 @@ import {
 	Sparkles,
 } from "lucide-react";
 import { useState } from "react";
+import type {
+	ClarificationQuestion,
+	ClarificationQuestionKind,
+} from "#/domain/workbook";
 import { Button } from "#/presentation/components/catalyst/button";
 
-type QuestionKind = "required" | "conflict" | "optional";
+const SKIP_VALUE = "__skip__";
 
-interface QuestionOption {
-	id: string;
-	title: string;
-	detail?: string;
+type DisplayKind = "required" | "conflict" | "optional";
+
+export interface ClarificationAnswer {
+	question: ClarificationQuestion;
+	selectedValue: string;
+	selectedLabel: string;
 }
-
-interface Question {
-	id: string;
-	kind: QuestionKind;
-	title: string;
-	description: string;
-	options: QuestionOption[];
-	letWorbooDecide?: boolean;
-}
-
-const QUESTIONS: Question[] = [
-	{
-		id: "level",
-		kind: "required",
-		title: "What level are your students?",
-		description: "We'll match exercise difficulty and vocabulary range.",
-		options: [
-			{ id: "a1", title: "A1", detail: "Beginner" },
-			{ id: "a2", title: "A2", detail: "Elementary" },
-			{ id: "b1", title: "B1", detail: "Intermediate" },
-			{ id: "b2", title: "B2", detail: "Upper-intermediate" },
-		],
-	},
-	{
-		id: "duration-vs-count",
-		kind: "conflict",
-		title:
-			"You mentioned 20 minutes and 15 exercises. Which should take priority?",
-		description:
-			"Fifteen exercises usually needs at least 35 minutes for A2 learners.",
-		options: [
-			{
-				id: "keep-20",
-				title: "Keep it to 20 minutes",
-				detail: "About 6–8 exercises",
-			},
-			{
-				id: "keep-15",
-				title: "Keep 15 exercises",
-				detail: "Extend to ~40 minutes",
-			},
-			{
-				id: "split",
-				title: "Split across two lessons",
-				detail: "20 min each",
-			},
-		],
-	},
-	{
-		id: "theme",
-		kind: "optional",
-		title: "Would you like a theme to make the lesson more engaging?",
-		description: "A theme ties exercises together with a shared context.",
-		options: [
-			{ id: "weekend", title: "Weekend activities" },
-			{ id: "summer", title: "Last summer holiday" },
-			{ id: "movies", title: "Favourite movies" },
-		],
-		letWorbooDecide: true,
-	},
-];
-
-const BLOCKING_KINDS: QuestionKind[] = ["required", "conflict"];
 
 interface ChatQuestionsProps {
-	onGenerate: () => void;
+	questions: ClarificationQuestion[];
+	isGenerating: boolean;
+	onSubmit: (answers: ClarificationAnswer[]) => void;
 }
 
-export function ChatQuestions({ onGenerate }: ChatQuestionsProps) {
-	const [answers, setAnswers] = useState<Record<string, string>>({});
+export function ChatQuestions({
+	questions,
+	isGenerating,
+	onSubmit,
+}: ChatQuestionsProps) {
+	const [answers, setAnswers] = useState<Record<number, string>>({});
 
-	const blockingIds = QUESTIONS.filter((q) =>
-		BLOCKING_KINDS.includes(q.kind),
-	).map((q) => q.id);
-	const allBlockingAnswered = blockingIds.every((id) => answers[id]);
-	const answeredCount = Object.keys(answers).length;
+	const blockingIndexes = questions
+		.map((q, i) => ({ q, i }))
+		.filter(({ q }) => !q.skippable)
+		.map(({ i }) => i);
+	const allBlockingAnswered = blockingIndexes.every((i) => answers[i]);
+	const answeredCount = Object.values(answers).filter(
+		(v) => v && v !== SKIP_VALUE,
+	).length;
 
-	function setAnswer(questionId: string, optionId: string) {
-		setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
+	function setAnswer(index: number, value: string) {
+		setAnswers((prev) => ({ ...prev, [index]: value }));
+	}
+
+	function submit() {
+		const resolved: ClarificationAnswer[] = [];
+		questions.forEach((question, i) => {
+			const value = answers[i];
+			if (!value || value === SKIP_VALUE) return;
+			const option = question.options.find((o) => o.value === value);
+			if (!option) return;
+			resolved.push({
+				question,
+				selectedValue: value,
+				selectedLabel: option.label,
+			});
+		});
+		onSubmit(resolved);
 	}
 
 	return (
 		<div className="space-y-6">
 			<InfoBanner />
 
-			{QUESTIONS.map((q) => (
+			{questions.map((question, index) => (
 				<QuestionCard
-					key={q.id}
-					question={q}
-					answer={answers[q.id] ?? null}
-					onAnswer={(optionId) => setAnswer(q.id, optionId)}
+					key={question.text}
+					question={question}
+					answer={answers[index] ?? null}
+					onAnswer={(value) => setAnswer(index, value)}
 				/>
 			))}
 
 			<QuestionsFooter
 				answered={answeredCount}
-				total={QUESTIONS.length}
-				canSubmit={allBlockingAnswered}
-				onGenerate={onGenerate}
+				total={questions.length}
+				canSubmit={allBlockingAnswered && !isGenerating}
+				isGenerating={isGenerating}
+				onGenerate={submit}
 			/>
 		</div>
 	);
+}
+
+function displayKind(kind: ClarificationQuestionKind): DisplayKind {
+	if (kind === "required") return "required";
+	if (kind === "conflict") return "conflict";
+	return "optional";
 }
 
 function InfoBanner() {
@@ -138,9 +113,9 @@ function QuestionCard({
 	answer,
 	onAnswer,
 }: {
-	question: Question;
+	question: ClarificationQuestion;
 	answer: string | null;
-	onAnswer: (optionId: string) => void;
+	onAnswer: (value: string) => void;
 }) {
 	const gridCols =
 		question.options.length >= 4
@@ -150,31 +125,34 @@ function QuestionCard({
 	return (
 		<div className="space-y-4 rounded-lg border border-zinc-950/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-900">
 			<div className="space-y-2">
-				<KindBadge kind={question.kind} />
+				<KindBadge kind={displayKind(question.kind)} />
 				<h3 className="text-lg font-bold text-zinc-950 dark:text-white">
-					{question.title}
+					{question.text}
 				</h3>
-				<p className="text-sm text-zinc-600 dark:text-zinc-400">
-					{question.description}
-				</p>
 			</div>
 
 			<div className={`grid gap-3 ${gridCols}`}>
 				{question.options.map((opt) => (
 					<OptionCard
-						key={opt.id}
-						option={opt}
-						selected={answer === opt.id}
-						onSelect={() => onAnswer(opt.id)}
+						key={opt.value}
+						label={opt.label}
+						selected={answer === opt.value}
+						onSelect={() => onAnswer(opt.value)}
 					/>
 				))}
 			</div>
 
-			{question.letWorbooDecide ? (
+			{question.skippable ? (
 				<div>
 					<button
 						type="button"
-						className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-zinc-950/20 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:border-white/20 dark:text-zinc-300 dark:hover:bg-white/5"
+						onClick={() => onAnswer(SKIP_VALUE)}
+						aria-pressed={answer === SKIP_VALUE}
+						className={
+							answer === SKIP_VALUE
+								? "inline-flex items-center gap-1.5 rounded-full border border-dashed border-violet-500 bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-700 transition-colors dark:border-violet-400 dark:bg-violet-950/30 dark:text-violet-200"
+								: "inline-flex items-center gap-1.5 rounded-full border border-dashed border-zinc-950/20 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:border-white/20 dark:text-zinc-300 dark:hover:bg-white/5"
+						}
 					>
 						<Sparkles className="size-3.5" />
 						Let Worboo decide
@@ -185,7 +163,7 @@ function QuestionCard({
 	);
 }
 
-function KindBadge({ kind }: { kind: QuestionKind }) {
+function KindBadge({ kind }: { kind: DisplayKind }) {
 	if (kind === "required") {
 		return (
 			<div className="flex items-center gap-2">
@@ -226,11 +204,11 @@ function KindBadge({ kind }: { kind: QuestionKind }) {
 }
 
 function OptionCard({
-	option,
+	label,
 	selected,
 	onSelect,
 }: {
-	option: QuestionOption;
+	label: string;
 	selected: boolean;
 	onSelect: () => void;
 }) {
@@ -258,13 +236,8 @@ function OptionCard({
 			</span>
 			<div className="min-w-0">
 				<p className="text-sm font-medium text-zinc-950 dark:text-white">
-					{option.title}
+					{label}
 				</p>
-				{option.detail ? (
-					<p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-						{option.detail}
-					</p>
-				) : null}
 			</div>
 		</button>
 	);
@@ -274,11 +247,13 @@ function QuestionsFooter({
 	answered,
 	total,
 	canSubmit,
+	isGenerating,
 	onGenerate,
 }: {
 	answered: number;
 	total: number;
 	canSubmit: boolean;
+	isGenerating: boolean;
 	onGenerate: () => void;
 }) {
 	return (
@@ -300,7 +275,7 @@ function QuestionsFooter({
 				disabled={!canSubmit}
 				onClick={onGenerate}
 			>
-				Generate workbook
+				{isGenerating ? "Generating…" : "Generate workbook"}
 				<ArrowRight data-slot="icon" />
 			</Button>
 		</div>

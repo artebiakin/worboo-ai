@@ -44,13 +44,12 @@ export function MultipleChoiceBlock({
 			{revealed ? (
 				<ExplanationPanel>
 					<ol className="space-y-3">
-						{exercise.options.map((opt, i) => {
-							const letter = String.fromCharCode(65 + i);
+						{exercise.options.map((opt) => {
 							return (
 								<li key={opt.text} className="space-y-1">
 									<p className="text-sm">
 										<span className="mr-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-											{letter}
+											{opt.label}
 										</span>
 										<span
 											className={

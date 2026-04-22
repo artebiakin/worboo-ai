@@ -1,17 +1,12 @@
 import { ChatComposer } from "./components/ChatComposer";
 import { ChatProgress, type ProgressStep } from "./components/ChatProgress";
 import { ChatQuestions } from "./components/ChatQuestions";
-import { MOCK_WORKBOOK } from "./components/mock-workbook";
 import { PromptCard } from "./components/PromptCard";
 import { WorkbookPreview } from "./components/WorkbookPreview";
 import { useChat } from "./hooks";
 
-const ANALYSIS_STEPS: readonly ProgressStep[] = [
-	{ id: "understanding", label: "Understanding your request" },
-	{ id: "planning", label: "Planning exercises" },
-];
-
 const BUILD_STEPS: readonly ProgressStep[] = [
+	{ id: "planning", label: "Planning exercises" },
 	{ id: "writing", label: "Writing content" },
 	{ id: "explaining", label: "Adding explanations" },
 ];
@@ -25,17 +20,19 @@ export function ChatView({ chatId, initialPrompt }: ChatViewProps) {
 	const {
 		phase,
 		prompt,
-		analysisPercent,
+		workbook,
+		clarificationQuestions,
 		buildPercent,
 		composerValue,
 		setComposerValue,
 		canSubmitComposer,
 		handleSubmitComposer,
-		handleGenerate,
+		handleSubmitAnswers,
+		isGenerating,
 	} = useChat({ chatId, initialPrompt });
 
-	if (phase === "preview") {
-		return <WorkbookPreview workbook={MOCK_WORKBOOK} />;
+	if (phase === "preview" && workbook) {
+		return <WorkbookPreview workbook={workbook} />;
 	}
 
 	return (
@@ -47,24 +44,23 @@ export function ChatView({ chatId, initialPrompt }: ChatViewProps) {
 					canSubmit={canSubmitComposer}
 					onSubmit={handleSubmitComposer}
 				/>
+			) : phase === "questions" && clarificationQuestions ? (
+				<div className="mx-auto w-full max-w-3xl space-y-6">
+					<PromptCard prompt={prompt} />
+					<ChatQuestions
+						questions={clarificationQuestions}
+						isGenerating={isGenerating}
+						onSubmit={handleSubmitAnswers}
+					/>
+				</div>
 			) : (
 				<div className="mx-auto w-full max-w-3xl space-y-6">
 					<PromptCard prompt={prompt} />
-					{phase === "analyzing" ? (
-						<ChatProgress
-							percent={analysisPercent}
-							steps={ANALYSIS_STEPS}
-							footerText="Analysing your prompt. Just a moment…"
-						/>
-					) : phase === "building" ? (
-						<ChatProgress
-							percent={buildPercent}
-							steps={BUILD_STEPS}
-							footerText="Building your workbook. This usually takes 10–20 seconds."
-						/>
-					) : (
-						<ChatQuestions onGenerate={handleGenerate} />
-					)}
+					<ChatProgress
+						percent={buildPercent}
+						steps={BUILD_STEPS}
+						footerText="Building your workbook. This usually takes 10–20 seconds."
+					/>
 				</div>
 			)}
 		</div>

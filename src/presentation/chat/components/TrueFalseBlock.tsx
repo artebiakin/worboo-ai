@@ -27,12 +27,11 @@ export function TrueFalseBlock({
 	}, [exercise.id, correct, onScoreChange]);
 
 	return (
-		<ExerciseCard
-			id={exercise.id}
-			kind={exercise.kind}
-			instructions={exercise.instructions}
-		>
+		<ExerciseCard id={exercise.id} kind={exercise.kind}>
 			<div className="space-y-5">
+				{exercise.prompt ? (
+					<p className="exercise-instructions">{exercise.prompt}</p>
+				) : null}
 				<p className="exercise-focal">“{exercise.statement}”</p>
 				<div className="grid grid-cols-2 gap-3">
 					<TrueFalseOption
@@ -70,7 +69,7 @@ export function TrueFalseBlock({
 							isCorrect={exercise.correctAnswer === false}
 							text={exercise.explanationIfFalseChosen}
 						/>
-						{exercise.correctAnswer === false ? (
+						{exercise.correctAnswer === false && exercise.correction ? (
 							<ChoiceLine label="Correction" text={exercise.correction} />
 						) : null}
 					</dl>

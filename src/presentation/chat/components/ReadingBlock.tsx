@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Exercise, ReadingQuestion } from "#/domain/workbook";
+import type { Exercise, ReadingSubQuestion } from "#/domain/workbook";
 import { ExerciseCard, KIND_DEFAULT_INSTRUCTIONS } from "./ExerciseCard";
 import { ExplanationPanel } from "./ExplanationPanel";
 import type { ReportScore, Score } from "./exercise-reveal";
@@ -40,21 +40,20 @@ export function ReadingBlock({
 		<ExerciseCard
 			id={exercise.id}
 			kind={exercise.kind}
-			instructions={exercise.instructions}
+			instructions={exercise.prompt}
 		>
 			<blockquote className="space-y-3 border-l-4 border-zinc-950/20 pl-6 dark:border-white/20">
 				<h3 className="font-display text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
-					{exercise.title}
+					{exercise.passage.title}
 				</h3>
-				<p className="exercise-focal">“{exercise.text}”</p>
+				<p className="exercise-focal">“{exercise.passage.text}”</p>
 			</blockquote>
 
 			<ol className="mt-6 divide-y divide-zinc-950/10 border-t border-zinc-950/10 pt-6 dark:divide-white/10 dark:border-white/10">
 				{exercise.questions.map((q, i) => {
-					const letter = String.fromCharCode(65 + i);
-					const label = `Question ${exercise.id}${letter}`;
+					const label = `Question ${q.id}`;
 					return (
-						<li key={label} className="py-6 first:pt-0 last:pb-0">
+						<li key={q.id} className="py-6 first:pt-0 last:pb-0">
 							<QuestionContent
 								question={q}
 								label={label}
@@ -77,7 +76,7 @@ function QuestionContent({
 	index,
 	reportScore,
 }: {
-	question: ReadingQuestion;
+	question: ReadingSubQuestion;
 	label: string;
 	revealed: boolean;
 	index: number;
@@ -159,7 +158,7 @@ function QuestionContent({
 							isCorrect={question.correctAnswer === false}
 							text={question.explanationIfFalseChosen}
 						/>
-						{question.correctAnswer === false ? (
+						{question.correctAnswer === false && question.correction ? (
 							<ChoiceLine label="Correction" text={question.correction} />
 						) : null}
 					</dl>
@@ -168,13 +167,12 @@ function QuestionContent({
 			{revealed && question.kind === "multipleChoice" ? (
 				<ExplanationPanel>
 					<ol className="space-y-3">
-						{question.options.map((opt, i) => {
-							const letter = String.fromCharCode(65 + i);
+						{question.options.map((opt) => {
 							return (
 								<li key={opt.text} className="space-y-1">
 									<p className="text-sm">
 										<span className="mr-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-											{letter}
+											{opt.label}
 										</span>
 										<span
 											className={

@@ -11,27 +11,29 @@ import {
 
 function makeWorkbook(overrides: Partial<Workbook> = {}): Workbook {
 	const base: Workbook = {
-		topic: "Past simple",
-		targetLanguage: "English",
-		level: "A2",
 		title: "Past simple practice",
-		tags: ["grammar"],
+		eyebrow: "Past Simple · A2 English",
 		intro: "Welcome to the workbook.",
 		objectives: ["Use past simple in context"],
-		exercises: [],
-		suggestions: [],
-		reasoning: {
-			detectedLanguage: "English",
-			detectedLevel: "A2",
-			chosenTopic: "Past simple",
-			chosenSkillFocus: "grammar",
-			chosenAgeGroup: "adults",
-			chosenDurationMinutes: 20,
-			chosenExerciseCounts: {},
-			chosenDifficultyDistribution: "uniform",
+		meta: {
+			targetLanguage: "English",
+			nativeLanguage: "English",
+			level: "A2",
+			levelLabel: "Elementary",
+			skillFocus: "grammar",
+			topic: "Past simple",
+			ageGroup: "adults",
+			ageLabel: "Adults",
+			durationMinutes: 20,
+			exerciseCount: 0,
 		},
+		exercises: [],
 	};
-	return { ...base, ...overrides };
+	return {
+		...base,
+		...overrides,
+		meta: { ...base.meta, ...(overrides.meta ?? {}) },
+	};
 }
 
 const MC_EXERCISE: Exercise = {
@@ -40,14 +42,22 @@ const MC_EXERCISE: Exercise = {
 	prompt: "Pick the past simple of 'go'.",
 	options: [
 		{
+			label: "A",
 			text: "goed",
 			isCorrect: false,
 			explanationIfChosen: "'go' is irregular — there is no 'goed'.",
 		},
 		{
+			label: "B",
 			text: "went",
 			isCorrect: true,
 			explanationIfChosen: "Correct! 'go' is irregular: past simple is 'went'.",
+		},
+		{
+			label: "C",
+			text: "going",
+			isCorrect: false,
+			explanationIfChosen: "'going' is the -ing form, not past simple.",
 		},
 	],
 };
@@ -55,6 +65,7 @@ const MC_EXERCISE: Exercise = {
 const TF_EXERCISE: Exercise = {
 	id: 2,
 	kind: "trueFalse",
+	prompt: "True or false?",
 	statement: "'Go' is regular.",
 	correctAnswer: false,
 	correction: "'Go' is irregular.",
@@ -65,9 +76,18 @@ const TF_EXERCISE: Exercise = {
 describe("workbookFilename", () => {
 	it("joins slugified language, topic, level and title", () => {
 		const workbook = makeWorkbook({
-			targetLanguage: "English",
-			topic: "Past simple",
-			level: "A2",
+			meta: {
+				targetLanguage: "English",
+				nativeLanguage: "English",
+				level: "A2",
+				levelLabel: "Elementary",
+				skillFocus: "grammar",
+				topic: "Past simple",
+				ageGroup: "adults",
+				ageLabel: "Adults",
+				durationMinutes: 20,
+				exerciseCount: 0,
+			},
 			title: "Past simple practice",
 		});
 		expect(workbookFilename(workbook)).toBe(
@@ -77,9 +97,18 @@ describe("workbookFilename", () => {
 
 	it("strips diacritics and punctuation", () => {
 		const workbook = makeWorkbook({
-			targetLanguage: "Español",
-			topic: "Pretérito indefinido!",
-			level: "B1",
+			meta: {
+				targetLanguage: "Español",
+				nativeLanguage: "English",
+				level: "B1",
+				levelLabel: "Intermediate",
+				skillFocus: "grammar",
+				topic: "Pretérito indefinido!",
+				ageGroup: "adults",
+				ageLabel: "Adults",
+				durationMinutes: 20,
+				exerciseCount: 0,
+			},
 			title: "Práctica — día 1",
 		});
 		expect(workbookFilename(workbook)).toBe(
@@ -88,23 +117,22 @@ describe("workbookFilename", () => {
 	});
 
 	it("falls back to 'workbook.html' when every part slugifies to empty", () => {
-		const workbook = makeWorkbook({
-			targetLanguage: "!!!",
-			topic: "***",
-			title: "   ",
-		});
-		// level is A2 so it still contributes; test with a fully empty case
-		const empty = { ...workbook, level: "A2" as const };
-		expect(workbookFilename(empty)).toBe("a2.html");
-
 		const totallyEmpty = makeWorkbook({
-			targetLanguage: "",
-			topic: "",
+			meta: {
+				targetLanguage: "",
+				nativeLanguage: "",
+				level: "" as unknown as "A2",
+				levelLabel: "",
+				skillFocus: "grammar",
+				topic: "",
+				ageGroup: "adults",
+				ageLabel: "",
+				durationMinutes: 20,
+				exerciseCount: 0,
+			},
 			title: "",
 		});
-		// level still contributes; we want to confirm the fallback path exists
-		const stripped = { ...totallyEmpty, level: "" as unknown as "A2" };
-		expect(workbookFilename(stripped)).toBe("workbook.html");
+		expect(workbookFilename(totallyEmpty)).toBe("workbook.html");
 	});
 });
 
@@ -126,19 +154,27 @@ describe("workbookToHtml", () => {
 	});
 
 	it("adds lang attribute for known languages", () => {
-		expect(workbookToHtml(makeWorkbook({ targetLanguage: "English" }))).toMatch(
-			/<html lang="en">/,
-		);
-		expect(workbookToHtml(makeWorkbook({ targetLanguage: "Spanish" }))).toMatch(
-			/<html lang="es">/,
-		);
 		expect(
-			workbookToHtml(makeWorkbook({ targetLanguage: "Ukrainian" })),
+			workbookToHtml(
+				makeWorkbook({ meta: makeMeta({ targetLanguage: "English" }) }),
+			),
+		).toMatch(/<html lang="en">/);
+		expect(
+			workbookToHtml(
+				makeWorkbook({ meta: makeMeta({ targetLanguage: "Spanish" }) }),
+			),
+		).toMatch(/<html lang="es">/);
+		expect(
+			workbookToHtml(
+				makeWorkbook({ meta: makeMeta({ targetLanguage: "Ukrainian" }) }),
+			),
 		).toMatch(/<html lang="uk">/);
 	});
 
 	it("omits lang attribute for unknown languages", () => {
-		const html = workbookToHtml(makeWorkbook({ targetLanguage: "Klingon" }));
+		const html = workbookToHtml(
+			makeWorkbook({ meta: makeMeta({ targetLanguage: "Klingon" }) }),
+		);
 		expect(html).toContain("<html>\n");
 		expect(html).not.toMatch(/<html lang=/);
 	});
@@ -154,14 +190,22 @@ describe("workbookToHtml", () => {
 					prompt: "<b>bold</b>?",
 					options: [
 						{
+							label: "A",
 							text: `<img src=x onerror=alert(1)>`,
 							isCorrect: false,
 							explanationIfChosen: "Nope.",
 						},
 						{
+							label: "B",
 							text: "safe",
 							isCorrect: true,
 							explanationIfChosen: "Correct! safe.",
+						},
+						{
+							label: "C",
+							text: "other",
+							isCorrect: false,
+							explanationIfChosen: "Also not.",
 						},
 					],
 				},
@@ -195,13 +239,14 @@ describe("workbookToHtml", () => {
 				{
 					id: 7,
 					kind: "matching",
+					prompt: "Match the verb with its past simple.",
 					leftLabel: "Base",
 					rightLabel: "Past",
 					pairs: [
-						{ left: "go", right: "went", explanation: "irregular" },
-						{ left: "have", right: "had", explanation: "irregular" },
-						{ left: "see", right: "saw", explanation: "irregular" },
-						{ left: "buy", right: "bought", explanation: "irregular" },
+						{ left: "go", right: "went" },
+						{ left: "have", right: "had" },
+						{ left: "see", right: "saw" },
+						{ left: "buy", right: "bought" },
 					],
 				},
 			],
@@ -213,11 +258,11 @@ describe("workbookToHtml", () => {
 
 	it("shuffles matching right-column options but keeps every value", () => {
 		const pairs = [
-			{ left: "go", right: "went", explanation: "" },
-			{ left: "have", right: "had", explanation: "" },
-			{ left: "see", right: "saw", explanation: "" },
-			{ left: "buy", right: "bought", explanation: "" },
-			{ left: "take", right: "took", explanation: "" },
+			{ left: "go", right: "went" },
+			{ left: "have", right: "had" },
+			{ left: "see", right: "saw" },
+			{ left: "buy", right: "bought" },
+			{ left: "take", right: "took" },
 		];
 		const html = workbookToHtml(
 			makeWorkbook({
@@ -225,6 +270,7 @@ describe("workbookToHtml", () => {
 					{
 						id: 1,
 						kind: "matching",
+						prompt: "Match the verb with its past simple.",
 						leftLabel: "Base",
 						rightLabel: "Past",
 						pairs,
@@ -244,6 +290,7 @@ describe("workbookToHtml", () => {
 					{
 						id: 3,
 						kind: "fillBlank",
+						prompt: "Complete the sentence with the past simple.",
 						sentence: "Yesterday I {{blank}} to the park.",
 						blanks: [
 							{
@@ -266,6 +313,74 @@ describe("workbookToHtml", () => {
 		// 'went' is option index 1.
 		expect(html).toMatch(/data-q-kind="mc"[^>]*data-correct-index="1"/);
 	});
+
+	it("escapes reading sub-question ids in HTML attributes", () => {
+		// Defense-in-depth: the schema already rejects ids outside
+		// [a-zA-Z0-9_-], but the renderer must still escape in case a bad id
+		// bypasses validation (e.g. a caller that skips safeParse).
+		const payload = '1a" onfocus=alert(1) autofocus="x';
+		const html = workbookToHtml(
+			makeWorkbook({
+				exercises: [
+					{
+						id: 1,
+						kind: "reading",
+						prompt: "Read, then answer.",
+						passage: { title: "P", text: "Some passage text." },
+						questions: [
+							{
+								id: payload,
+								kind: "multipleChoice",
+								prompt: "?",
+								options: [
+									{
+										label: "A",
+										text: "a",
+										isCorrect: true,
+										explanationIfChosen: "ok",
+									},
+									{
+										label: "B",
+										text: "b",
+										isCorrect: false,
+										explanationIfChosen: "no",
+									},
+									{
+										label: "C",
+										text: "c",
+										isCorrect: false,
+										explanationIfChosen: "no",
+									},
+								],
+							},
+							{
+								id: payload,
+								kind: "trueFalse",
+								prompt: "?",
+								statement: "x",
+								correctAnswer: true,
+								explanationIfTrueChosen: "ok",
+								explanationIfFalseChosen: "no",
+							},
+						],
+					},
+				],
+			}),
+		);
+		// The raw payload (with an unescaped ") must never appear — that's
+		// what would break out of the attribute and turn `onfocus=...` into
+		// a real event handler. The substring `onfocus=alert(1)` *does*
+		// appear inside the escaped value, which is safe: it's just text
+		// inside a properly-closed attribute.
+		expect(html).not.toContain(payload);
+		// Prove the boundary holds: name="q-1a&quot;..." — the first " in
+		// the payload is escaped, so the attribute value stays one token.
+		expect(html).toContain(
+			'name="q-1a&quot; onfocus=alert(1) autofocus=&quot;x"',
+		);
+		// And no attribute boundary leaks `q-1a"` followed by raw markup.
+		expect(html).not.toMatch(/name="q-1a"\s/);
+	});
 });
 
 function mountWorkbook(workbook: Workbook): HTMLElement {
@@ -278,6 +393,22 @@ function mountWorkbook(workbook: Workbook): HTMLElement {
 
 function clickCheck(): void {
 	document.querySelector<HTMLButtonElement>("#wb-check")?.click();
+}
+
+function makeMeta(overrides: Partial<Workbook["meta"]> = {}): Workbook["meta"] {
+	return {
+		targetLanguage: "English",
+		nativeLanguage: "English",
+		level: "A2",
+		levelLabel: "Elementary",
+		skillFocus: "grammar",
+		topic: "Past simple",
+		ageGroup: "adults",
+		ageLabel: "Adults",
+		durationMinutes: 20,
+		exerciseCount: 0,
+		...overrides,
+	};
 }
 
 describe("workbookInit reveal behavior", () => {
@@ -364,6 +495,7 @@ describe("workbookInit reveal behavior", () => {
 					{
 						id: 9,
 						kind: "fillBlank",
+						prompt: "Fill in the blank.",
 						sentence: "Yesterday I {{blank}} home.",
 						blanks: [
 							{
@@ -392,6 +524,7 @@ describe("workbookInit reveal behavior", () => {
 					{
 						id: 9,
 						kind: "fillBlank",
+						prompt: "Fill in the blank.",
 						sentence: "Yesterday I {{blank}} home.",
 						blanks: [
 							{
@@ -420,24 +553,29 @@ describe("workbookInit reveal behavior", () => {
 					{
 						id: 5,
 						kind: "matching",
+						prompt: "Match the verb with its past simple.",
 						leftLabel: "Base",
 						rightLabel: "Past",
 						pairs: [
-							{ left: "go", right: "went", explanation: "irregular" },
-							{ left: "have", right: "had", explanation: "irregular" },
+							{ left: "go", right: "went" },
+							{ left: "have", right: "had" },
+							{ left: "see", right: "saw" },
 						],
 					},
 				],
 			}),
 		);
-		const [row1, row2] = document.querySelectorAll<HTMLElement>(".match-row");
+		const [row1, row2, row3] =
+			document.querySelectorAll<HTMLElement>(".match-row");
 		const s1 = row1?.querySelector<HTMLSelectElement>("select");
 		const s2 = row2?.querySelector<HTMLSelectElement>("select");
+		const s3 = row3?.querySelector<HTMLSelectElement>("select");
 		if (s1) s1.value = "had"; // wrong for 'go'
-		// leave s2 blank
+		// leave s2 and s3 blank
 		clickCheck();
 		expect(s1?.value).toBe("went");
 		expect(s2?.value).toBe("had");
+		expect(s3?.value).toBe("saw");
 		expect(s1?.disabled).toBe(true);
 		expect(s2?.disabled).toBe(true);
 		expect(row1?.getAttribute("data-state")).toBe("incorrect");

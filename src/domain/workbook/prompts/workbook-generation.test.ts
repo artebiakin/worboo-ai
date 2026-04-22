@@ -2,24 +2,57 @@ import { describe, expect, it } from "vitest";
 import { buildSystemPrompt, buildUserPrompt } from "./workbook-generation";
 
 describe("buildSystemPrompt", () => {
-	it("pins the offline requirement and exercise kinds", () => {
+	it("names every exercise kind discriminator the renderer understands", () => {
 		const system = buildSystemPrompt();
-		expect(system).toContain("offline");
-		expect(system).toContain("reading");
 		expect(system).toContain("multipleChoice");
 		expect(system).toContain("trueFalse");
 		expect(system).toContain("fillBlank");
 		expect(system).toContain("matching");
+		expect(system).toContain("reading");
 	});
 
-	it("tells the model to use the literal blank placeholder", () => {
+	it("tells the model to use the literal {{blank}} placeholder", () => {
 		const system = buildSystemPrompt();
 		expect(system).toContain("{{blank}}");
 	});
 
-	it("tells the model to populate the reasoning field", () => {
+	it("lists every required top-level content field in the output contract", () => {
+		// Regression guard: a small model once returned only `exercises` and
+		// skipped all metadata. The prompt must enumerate each required field.
 		const system = buildSystemPrompt();
-		expect(system.toLowerCase()).toContain("reasoning");
+		for (const field of [
+			"title",
+			"eyebrow",
+			"intro",
+			"objectives",
+			"exercises",
+			"suggestions",
+			"reasoning",
+		]) {
+			expect(system).toMatch(new RegExp(`["\`]${field}["\`]`));
+		}
+	});
+
+	it("enumerates the full suggestion catalog the UI supports", () => {
+		const system = buildSystemPrompt();
+		for (const id of [
+			"levelUp",
+			"levelDown",
+			"moreExercises",
+			"focusGrammar",
+			"focusVocab",
+			"shorterLesson",
+			"homeworkVersion",
+			"followUp",
+		]) {
+			expect(system).toContain(id);
+		}
+	});
+
+	it("describes the questions variant so the model can ask for clarification", () => {
+		const system = buildSystemPrompt();
+		expect(system).toContain('"questions"');
+		expect(system).toContain("skippable");
 	});
 });
 

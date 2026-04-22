@@ -1,32 +1,35 @@
-interface ExerciseBase {
-	id: number;
-	title?: string;
-	instructions?: string;
-}
+export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type SkillFocus = "grammar" | "vocabulary" | "reading" | "mixed";
+export type AgeGroup = "children" | "teenagers" | "adults";
+export type DifficultyDistribution = "progressive" | "uniform";
+
+export type SuggestionId =
+	| "levelUp"
+	| "levelDown"
+	| "moreExercises"
+	| "focusGrammar"
+	| "focusVocab"
+	| "shorterLesson"
+	| "homeworkVersion"
+	| "followUp";
 
 export interface MultipleChoiceOption {
+	label: string;
 	text: string;
 	isCorrect: boolean;
 	explanationIfChosen: string;
 }
 
-export type TrueFalseAnswer =
-	| {
-			correctAnswer: true;
-			explanationIfTrueChosen: string;
-			explanationIfFalseChosen: string;
-	  }
-	| {
-			correctAnswer: false;
-			correction: string;
-			explanationIfTrueChosen: string;
-			explanationIfFalseChosen: string;
-	  };
+export interface TrueFalseAnswer {
+	correctAnswer: boolean;
+	correction?: string;
+	explanationIfTrueChosen: string;
+	explanationIfFalseChosen: string;
+}
 
 export interface MatchingPair {
 	left: string;
 	right: string;
-	explanation: string;
 }
 
 export interface FillBlank {
@@ -37,49 +40,96 @@ export interface FillBlank {
 
 export const FILL_BLANK_PLACEHOLDER = "{{blank}}";
 
-export type ReadingQuestion =
+interface ExerciseBase {
+	title?: string;
+}
+
+type MultipleChoiceExercise = ExerciseBase & {
+	id: number;
+	kind: "multipleChoice";
+	prompt: string;
+	options: MultipleChoiceOption[];
+};
+
+type TrueFalseExercise = ExerciseBase & {
+	id: number;
+	kind: "trueFalse";
+	prompt: string;
+	statement: string;
+} & TrueFalseAnswer;
+
+type FillBlankExercise = ExerciseBase & {
+	id: number;
+	kind: "fillBlank";
+	prompt: string;
+	sentence: string;
+	blanks: FillBlank[];
+};
+
+type MatchingExercise = ExerciseBase & {
+	id: number;
+	kind: "matching";
+	prompt: string;
+	leftLabel: string;
+	rightLabel: string;
+	pairs: MatchingPair[];
+};
+
+type ReadingExercise = ExerciseBase & {
+	id: number;
+	kind: "reading";
+	prompt: string;
+	passage: ReadingPassage;
+	questions: ReadingSubQuestion[];
+};
+
+export type Exercise =
+	| MultipleChoiceExercise
+	| TrueFalseExercise
+	| FillBlankExercise
+	| MatchingExercise
+	| ReadingExercise;
+
+export interface ReadingPassage {
+	title: string;
+	text: string;
+}
+
+export type ReadingSubQuestion =
 	| {
+			id: string;
 			kind: "multipleChoice";
 			prompt: string;
 			options: MultipleChoiceOption[];
 	  }
 	| ({
+			id: string;
 			kind: "trueFalse";
+			prompt: string;
 			statement: string;
 	  } & TrueFalseAnswer);
 
-export type Exercise =
-	| (ExerciseBase & {
-			kind: "reading";
-			title: string;
-			text: string;
-			questions: ReadingQuestion[];
-	  })
-	| (ExerciseBase & {
-			kind: "multipleChoice";
-			prompt: string;
-			options: MultipleChoiceOption[];
-	  })
-	| (ExerciseBase & {
-			kind: "trueFalse";
-			statement: string;
-	  } & TrueFalseAnswer)
-	| (ExerciseBase & {
-			kind: "fillBlank";
-			sentence: string;
-			blanks: FillBlank[];
-	  })
-	| (ExerciseBase & {
-			kind: "matching";
-			leftLabel: string;
-			rightLabel: string;
-			pairs: MatchingPair[];
-	  });
+export interface WorkbookMeta {
+	targetLanguage: string;
+	nativeLanguage: string;
+	level: CefrLevel;
+	levelLabel: string;
+	skillFocus: SkillFocus;
+	topic: string;
+	ageGroup: AgeGroup;
+	ageLabel: string;
+	durationMinutes: number;
+	exerciseCount: number;
+}
 
-export type SkillFocus = "grammar" | "vocabulary" | "reading" | "mixed";
-export type AgeGroup = "children" | "teenagers" | "adults";
-export type DifficultyDistribution = "progressive" | "uniform";
-export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export interface Workbook {
+	title: string;
+	eyebrow: string;
+	intro: string;
+	objectives: string[];
+	meta: WorkbookMeta;
+	exercises: Exercise[];
+}
 
 export interface WorkbookReasoning {
 	detectedLanguage: string;
@@ -93,15 +143,21 @@ export interface WorkbookReasoning {
 	notes?: string;
 }
 
-export interface Workbook {
-	topic: string;
-	targetLanguage: string;
-	level: CefrLevel;
-	title: string;
-	tags: string[];
-	intro: string;
-	objectives: string[];
-	exercises: Exercise[];
-	suggestions: string[];
-	reasoning: WorkbookReasoning;
+export type ClarificationQuestionKind =
+	| "required"
+	| "conflict"
+	| "clarify"
+	| "enhance"
+	| "choice";
+
+export interface ClarificationOption {
+	label: string;
+	value: string;
+}
+
+export interface ClarificationQuestion {
+	kind: ClarificationQuestionKind;
+	text: string;
+	options: ClarificationOption[];
+	skippable: boolean;
 }

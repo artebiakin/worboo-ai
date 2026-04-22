@@ -46,7 +46,7 @@ export function FillBlankBlock({
 		<ExerciseCard
 			id={exercise.id}
 			kind={exercise.kind}
-			instructions={exercise.instructions}
+			instructions={exercise.prompt}
 		>
 			<p className="exercise-focal">
 				{segments.map((segment, i) => {
