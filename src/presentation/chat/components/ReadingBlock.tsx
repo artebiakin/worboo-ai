@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Exercise, ReadingQuestion } from "#/domain/workbook";
 import { ExerciseCard, KIND_DEFAULT_INSTRUCTIONS } from "./ExerciseCard";
-import { CorrectBadge, ExplanationPanel } from "./ExplanationPanel";
+import { ExplanationPanel } from "./ExplanationPanel";
 import type { ReportScore, Score } from "./exercise-reveal";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { optionCardStyle } from "./option-card-style";
@@ -66,11 +66,6 @@ export function ReadingBlock({
 					);
 				})}
 			</ol>
-			{revealed ? (
-				<ExplanationPanel label="Exercise summary">
-					{exercise.canonicalExplanation}
-				</ExplanationPanel>
-			) : null}
 		</ExerciseCard>
 	);
 }
@@ -129,48 +124,72 @@ function QuestionContent({
 				<MultipleChoiceOptions
 					name={label}
 					options={question.options}
-					selected={answer}
+					selected={
+						revealed
+							? (question.options.find((o) => o.isCorrect)?.text ?? null)
+							: answer
+					}
 					onSelect={setAnswer}
 					revealCorrect={revealed}
+					disabled={revealed}
 				/>
 			) : (
 				<TrueFalseOptions
 					name={label}
 					correctAnswer={question.correctAnswer}
-					selected={answer}
+					selected={
+						revealed ? (question.correctAnswer ? "True" : "False") : answer
+					}
 					onSelect={setAnswer}
 					revealCorrect={revealed}
+					disabled={revealed}
 				/>
 			)}
 
-			{revealed ? (
+			{revealed && question.kind === "trueFalse" ? (
 				<ExplanationPanel>
-					{question.kind === "trueFalse" ? (
-						<dl className="space-y-2">
-							<ChoiceLine
-								label="If True"
-								isCorrect={question.correctAnswer === true}
-								text={question.explanationIfTrueChosen}
-							/>
-							<ChoiceLine
-								label="If False"
-								isCorrect={question.correctAnswer === false}
-								text={question.explanationIfFalseChosen}
-							/>
-							{question.correctAnswer === false ? (
-								<ChoiceLine label="Correction" text={question.correction} />
-							) : null}
-						</dl>
-					) : null}
-					<p
-						className={
-							question.kind === "trueFalse"
-								? "mt-3 border-t border-violet-500/20 pt-3 dark:border-violet-400/20"
-								: undefined
-						}
-					>
-						{question.canonicalExplanation}
-					</p>
+					<dl className="space-y-2">
+						<ChoiceLine
+							label="If True"
+							isCorrect={question.correctAnswer === true}
+							text={question.explanationIfTrueChosen}
+						/>
+						<ChoiceLine
+							label="If False"
+							isCorrect={question.correctAnswer === false}
+							text={question.explanationIfFalseChosen}
+						/>
+					</dl>
+				</ExplanationPanel>
+			) : null}
+			{revealed && question.kind === "multipleChoice" ? (
+				<ExplanationPanel>
+					<ol className="space-y-3">
+						{question.options.map((opt, i) => {
+							const letter = String.fromCharCode(65 + i);
+							return (
+								<li key={opt.text} className="space-y-1">
+									<p className="text-sm">
+										<span className="mr-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+											{letter}
+										</span>
+										<span
+											className={
+												opt.isCorrect
+													? "font-medium text-emerald-700 dark:text-emerald-400"
+													: ""
+											}
+										>
+											{opt.text}
+										</span>
+									</p>
+									<p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+										{opt.explanationIfChosen}
+									</p>
+								</li>
+							);
+						})}
+					</ol>
 				</ExplanationPanel>
 			) : null}
 		</div>
@@ -183,12 +202,14 @@ function TrueFalseOptions({
 	selected,
 	onSelect,
 	revealCorrect,
+	disabled,
 }: {
 	name: string;
 	correctAnswer: boolean;
 	selected: string | null;
 	onSelect: (value: string) => void;
 	revealCorrect: boolean;
+	disabled?: boolean;
 }) {
 	return (
 		<div className="grid grid-cols-2 gap-3">
@@ -197,20 +218,21 @@ function TrueFalseOptions({
 				const isCorrect =
 					(choice === "True" && correctAnswer) ||
 					(choice === "False" && !correctAnswer);
+				const showCorrect = revealCorrect && isCorrect;
 				return (
 					<label
 						key={choice}
-						className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected)}`}
+						className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected, showCorrect)} ${disabled ? "pointer-events-none" : ""}`}
 					>
 						<input
 							type="radio"
 							name={name}
-							className="size-4 accent-violet-600"
+							className={`size-4 ${showCorrect ? "accent-emerald-600" : "accent-violet-600"}`}
 							checked={isSelected}
-							onChange={() => onSelect(choice)}
+							readOnly={disabled}
+							onChange={disabled ? undefined : () => onSelect(choice)}
 						/>
 						<span>{choice}</span>
-						{revealCorrect && isCorrect ? <CorrectBadge /> : null}
 					</label>
 				);
 			})}
@@ -229,9 +251,14 @@ function ChoiceLine({
 }) {
 	return (
 		<div className="flex gap-3">
-			<dt className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+			<dt
+				className={`shrink-0 text-xs font-medium ${
+					isCorrect
+						? "text-emerald-700 dark:text-emerald-400"
+						: "text-zinc-500 dark:text-zinc-400"
+				}`}
+			>
 				{label}
-				{isCorrect ? <CorrectBadge /> : null}
 			</dt>
 			<dd>{text}</dd>
 		</div>

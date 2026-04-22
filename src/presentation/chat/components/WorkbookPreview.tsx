@@ -1,6 +1,14 @@
 import { Bookmark, Download, Eye, RefreshCw, X } from "lucide-react";
-import { useCallback, useState } from "react";
-import type { Exercise, Workbook } from "#/domain/workbook";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	type Exercise,
+	type Workbook,
+	workbookFilename,
+	workbookInit,
+	workbookMarkup,
+	workbookStyles,
+	workbookToHtml,
+} from "#/domain/workbook";
 import { Button } from "#/presentation/components/catalyst/button";
 import { Dialog } from "#/presentation/components/catalyst/dialog";
 import type { Score } from "./exercise-reveal";
@@ -19,9 +27,25 @@ interface WorkbookPreviewProps {
 export function WorkbookPreview({ workbook }: WorkbookPreviewProps) {
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+	const handleDownload = useCallback(() => {
+		const html = workbookToHtml(workbook);
+		const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = workbookFilename(workbook);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}, [workbook]);
+
 	return (
 		<div className="mx-auto w-full max-w-3xl space-y-6">
-			<WorkbookActions onPreview={() => setIsPreviewOpen(true)} />
+			<WorkbookActions
+				onPreview={() => setIsPreviewOpen(true)}
+				onDownload={handleDownload}
+			/>
 
 			<WorkbookHeader workbook={workbook} />
 
@@ -97,7 +121,13 @@ function ExerciseBlock({
 	}
 }
 
-function WorkbookActions({ onPreview }: { onPreview: () => void }) {
+function WorkbookActions({
+	onPreview,
+	onDownload,
+}: {
+	onPreview: () => void;
+	onDownload: () => void;
+}) {
 	return (
 		<div className="flex flex-wrap items-center justify-between gap-4">
 			<div className="flex flex-wrap items-center gap-2">
@@ -115,7 +145,7 @@ function WorkbookActions({ onPreview }: { onPreview: () => void }) {
 					<Bookmark data-slot="icon" />
 					Save to collection
 				</Button>
-				<Button type="button">
+				<Button type="button" onClick={onDownload}>
 					<Download data-slot="icon" />
 					Download
 				</Button>
@@ -133,32 +163,6 @@ function PreviewDialog({
 	open: boolean;
 	onClose: () => void;
 }) {
-	const [isChecked, setIsChecked] = useState(false);
-	const [scores, setScores] = useState<Record<number, Score>>({});
-
-	const reportScore = useCallback((exerciseId: number, score: Score) => {
-		setScores((prev) => {
-			const current = prev[exerciseId];
-			if (
-				current &&
-				current.correct === score.correct &&
-				current.total === score.total
-			) {
-				return prev;
-			}
-			return { ...prev, [exerciseId]: score };
-		});
-	}, []);
-
-	const totalCorrect = Object.values(scores).reduce(
-		(sum, s) => sum + s.correct,
-		0,
-	);
-	const totalQuestions = Object.values(scores).reduce(
-		(sum, s) => sum + s.total,
-		0,
-	);
-
 	return (
 		<Dialog size="4xl" open={open} onClose={onClose}>
 			<div className="flex items-center justify-between">
@@ -174,32 +178,26 @@ function PreviewDialog({
 					<X className="size-5" />
 				</button>
 			</div>
-			<div className="mt-4 space-y-6">
-				<WorkbookHeader
-					workbook={workbook}
-					score={
-						isChecked
-							? { correct: totalCorrect, total: totalQuestions }
-							: undefined
-					}
-				/>
-				<WorkbookIntro workbook={workbook} />
-				{workbook.exercises.map((exercise) => (
-					<ExerciseBlock
-						key={exercise.id}
-						exercise={exercise}
-						revealed={isChecked}
-						onScoreChange={reportScore}
-					/>
-				))}
-				{!isChecked ? (
-					<div className="flex justify-center pt-2">
-						<Button type="button" onClick={() => setIsChecked(true)}>
-							Check answers
-						</Button>
-					</div>
-				) : null}
-			</div>
+			{open ? <WorkbookShadow workbook={workbook} /> : null}
 		</Dialog>
+	);
+}
+
+function WorkbookShadow({ workbook }: { workbook: Workbook }) {
+	const hostRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const host = hostRef.current;
+		if (!host) return;
+		const root = host.shadowRoot ?? host.attachShadow({ mode: "open" });
+		root.innerHTML = `<style>${workbookStyles()}</style>${workbookMarkup(workbook)}`;
+		workbookInit(root);
+	}, [workbook]);
+
+	return (
+		<div
+			ref={hostRef}
+			className="my-6 py-6 overflow-hidden rounded-xl border border-zinc-950/10 dark:border-white/10"
+		/>
 	);
 }

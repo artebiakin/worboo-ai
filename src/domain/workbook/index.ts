@@ -1,3 +1,10 @@
+export {
+	workbookFilename,
+	workbookInit,
+	workbookMarkup,
+	workbookStyles,
+	workbookToHtml,
+} from "./export/workbook-to-html";
 export type {
 	AgeGroup,
 	CefrLevel,
@@ -12,5 +19,4 @@ export type {
 	Workbook,
 	WorkbookReasoning,
 } from "./models/Workbook";
-
 export { FILL_BLANK_PLACEHOLDER } from "./models/Workbook";

@@ -1,30 +1,29 @@
+import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ExplanationPanelProps {
 	label?: string;
 	children: ReactNode;
+	defaultOpen?: boolean;
 }
 
 export function ExplanationPanel({
-	label = "Answer key",
+	label = "Show explanation",
 	children,
+	defaultOpen = true,
 }: ExplanationPanelProps) {
 	return (
-		<div className="mt-5 rounded-md border border-violet-500/20 bg-violet-50/60 px-4 py-3 dark:border-violet-400/20 dark:bg-violet-950/20">
-			<p className="text-xs font-medium tracking-wider text-violet-700 uppercase dark:text-violet-300">
-				{label}
-			</p>
-			<div className="mt-1.5 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+		<details
+			open={defaultOpen}
+			className="group mt-5 overflow-hidden rounded-lg border border-zinc-950/10 bg-white dark:border-white/10 dark:bg-zinc-900"
+		>
+			<summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-950/2.5 dark:text-white dark:hover:bg-white/5 [&::-webkit-details-marker]:hidden">
+				<span>{label}</span>
+				<ChevronDown className="size-4 text-zinc-500 transition-transform group-open:rotate-180 dark:text-zinc-400" />
+			</summary>
+			<div className="border-t border-zinc-950/10 px-4 py-3 text-sm leading-relaxed text-zinc-700 dark:border-white/10 dark:text-zinc-300">
 				{children}
 			</div>
-		</div>
-	);
-}
-
-export function CorrectBadge() {
-	return (
-		<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400">
-			Correct
-		</span>
+		</details>
 	);
 }

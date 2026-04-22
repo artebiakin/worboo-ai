@@ -26,6 +26,7 @@ export type TrueFalseAnswer =
 export interface MatchingPair {
 	left: string;
 	right: string;
+	explanation: string;
 }
 
 export interface FillBlank {
@@ -41,12 +42,10 @@ export type ReadingQuestion =
 			kind: "multipleChoice";
 			prompt: string;
 			options: MultipleChoiceOption[];
-			canonicalExplanation: string;
 	  }
 	| ({
 			kind: "trueFalse";
 			statement: string;
-			canonicalExplanation: string;
 	  } & TrueFalseAnswer);
 
 export type Exercise =
@@ -55,31 +54,26 @@ export type Exercise =
 			title: string;
 			text: string;
 			questions: ReadingQuestion[];
-			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "multipleChoice";
 			prompt: string;
 			options: MultipleChoiceOption[];
-			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "trueFalse";
 			statement: string;
-			canonicalExplanation: string;
 	  } & TrueFalseAnswer)
 	| (ExerciseBase & {
 			kind: "fillBlank";
 			sentence: string;
 			blanks: FillBlank[];
-			canonicalExplanation: string;
 	  })
 	| (ExerciseBase & {
 			kind: "matching";
 			leftLabel: string;
 			rightLabel: string;
 			pairs: MatchingPair[];
-			canonicalExplanation: string;
 	  });
 
 export type SkillFocus = "grammar" | "vocabulary" | "reading" | "mixed";
