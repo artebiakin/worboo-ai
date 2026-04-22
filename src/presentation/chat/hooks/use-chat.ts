@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	type ClarificationQuestion,
@@ -69,6 +69,17 @@ export function useChat({
 		},
 	});
 
+	// When the user arrives with an `initialPrompt` (e.g. they typed in the
+	// home composer and navigated here), kick off the generation once on
+	// mount. Guarded by a ref so strict-mode double-invocation and prop
+	// changes can't fire a second request.
+	const kickedOffRef = useRef(false);
+	useEffect(() => {
+		if (!initialPrompt || kickedOffRef.current) return;
+		kickedOffRef.current = true;
+		mutation.mutate(initialPrompt);
+	}, [initialPrompt, mutation.mutate]);
+
 	const buildPercent = useFakeProgress(mutation.isPending);
 
 	const phase: ChatPhase = derivePhase({
@@ -129,7 +140,11 @@ function derivePhase({
 	if (clarificationQuestions && clarificationQuestions.length > 0) {
 		return "questions";
 	}
-	return "building";
+	// Nothing in flight, no workbook, no questions — fall back to the
+	// composer instead of an indefinite "building" state. This covers the
+	// brief window between `initialPrompt` being set and the kick-off
+	// effect dispatching the mutation.
+	return "composer";
 }
 
 function appendAnswersToPrompt(

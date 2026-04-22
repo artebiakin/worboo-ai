@@ -70,7 +70,11 @@ export function ChatQuestions({
 
 			{questions.map((question, index) => (
 				<QuestionCard
-					key={question.text}
+					// Questions are model-generated and have no stable id;
+					// `text` isn't guaranteed unique across a batch. Using
+					// the index is the pragmatic stable key here.
+					// biome-ignore lint/suspicious/noArrayIndexKey: see above
+					key={index}
 					question={question}
 					answer={answers[index] ?? null}
 					onAnswer={(value) => setAnswer(index, value)}

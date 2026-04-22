@@ -28,21 +28,27 @@ export const generateWorkbook = createServerFn({ method: "POST" })
 		}
 	});
 
+const CLIENT_FALLBACK_MESSAGE =
+	"Could not generate the workbook. Please try again.";
+
+/**
+ * Shapes the error that crosses the server-fn boundary to the browser.
+ * Only surfaces the plain `.message` of a known `Error` (and a sibling
+ * `Error` cause's message, if any). Non-Error values — provider response
+ * blobs, request metadata, etc. — get swallowed into a generic message
+ * so nothing internal leaks into a toast. Full details stay in the server
+ * log via `log.error(..., err, ...)` above.
+ */
 function describeError(err: unknown): string {
 	if (err instanceof Error) {
 		const parts: string[] = [];
 		if (err.name && err.name !== "Error") parts.push(err.name);
-		parts.push(err.message || "(no message)");
+		parts.push(err.message || CLIENT_FALLBACK_MESSAGE);
 		const causeMessage = extractCauseMessage(err.cause);
 		if (causeMessage) parts.push(`caused by: ${causeMessage}`);
 		return parts.join(" — ");
 	}
-	if (typeof err === "string") return err;
-	try {
-		return JSON.stringify(err);
-	} catch {
-		return "Unknown error during workbook generation.";
-	}
+	return CLIENT_FALLBACK_MESSAGE;
 }
 
 function extractCauseMessage(cause: unknown): string | null {

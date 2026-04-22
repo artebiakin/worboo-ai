@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MOCK_WORKBOOK } from "#/presentation/chat/components/mock-workbook";
+import { MOCK_WORKBOOK } from "../__fixtures__/mock-workbook";
 import { hydrateWorkbook } from "./hydrate-workbook";
 
 const FULL_RESPONSE = {
@@ -67,15 +67,19 @@ describe("hydrateWorkbook", () => {
 		expect(result.meta.ageLabel).toBe("Ages 13–17");
 	});
 
-	it("fills objectives with a single fallback when the model returns an empty array", () => {
+	it("fills objectives with two defaults when the model returns an empty array", () => {
+		// The schema requires 2–4 objectives, so a one-item fallback would
+		// produce a workbook that fails safeParse. Two defaults keep the
+		// hydrated result round-trippable through workbookSchema.
 		const result = hydrateWorkbook(
 			{
 				workbook: { ...EXERCISES_ONLY.workbook, objectives: [] },
 			},
 			{ prompt: "Past tenses", level: "B1" },
 		);
-		expect(result.objectives).toHaveLength(1);
+		expect(result.objectives).toHaveLength(2);
 		expect(result.objectives[0]).toMatch(/past tenses/i);
+		expect(result.objectives[1]).toMatch(/past tenses/i);
 	});
 
 	it("truncates an unusually long prompt when synthesising a topic", () => {

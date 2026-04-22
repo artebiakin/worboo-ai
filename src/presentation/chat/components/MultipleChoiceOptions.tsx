@@ -24,7 +24,7 @@ export function MultipleChoiceOptions({
 				const isSelected = selected === opt.text;
 				const showCorrect = revealCorrect && opt.isCorrect;
 				return (
-					<li key={opt.text}>
+					<li key={opt.label}>
 						<label
 							className={`flex items-start gap-4 rounded-lg border px-5 py-3 ${optionCardStyle(isSelected, showCorrect)}`}
 						>

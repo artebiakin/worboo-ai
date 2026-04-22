@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MOCK_WORKBOOK } from "#/presentation/chat/components/mock-workbook";
+import { MOCK_WORKBOOK } from "../__fixtures__/mock-workbook";
 import { workbookSchema } from "./workbook-schema";
 
 describe("workbookSchema", () => {
