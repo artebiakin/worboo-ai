@@ -1,4 +1,7 @@
-export function optionCardStyle(selected: boolean): string {
+export function optionCardStyle(selected: boolean, correct?: boolean): string {
+	if (correct) {
+		return "border-emerald-500 bg-emerald-50 text-zinc-950 transition-colors focus-within:ring-2 focus-within:ring-emerald-500/40 dark:border-emerald-400 dark:bg-emerald-950/30 dark:text-white";
+	}
 	if (selected) {
 		return "border-violet-500 bg-violet-50 text-zinc-950 transition-colors focus-within:ring-2 focus-within:ring-violet-500/40 dark:border-violet-400 dark:bg-violet-950/30 dark:text-white";
 	}

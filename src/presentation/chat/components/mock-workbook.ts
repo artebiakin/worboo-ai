@@ -50,8 +50,6 @@ export const MOCK_WORKBOOK: Workbook = {
 								"Her grandmother visited *her* on Sunday afternoon; Mia didn't go to grandma's house.",
 						},
 					],
-					canonicalExplanation:
-						"Find the Saturday time marker and the action that immediately follows it — the cinema is named in the first sentence.",
 				},
 				{
 					kind: "trueFalse",
@@ -62,8 +60,6 @@ export const MOCK_WORKBOOK: Workbook = {
 						"Re-read the text: 'On Sunday morning, Mia didn't go out.' She stayed at home.",
 					explanationIfFalseChosen:
 						"Correct! The text says 'Mia didn't go out' on Sunday morning — she stayed home and read a book.",
-					canonicalExplanation:
-						"Watch for negation: 'didn't go out' reverses 'went out'. A single 'not' flips the truth of the whole statement.",
 				},
 				{
 					kind: "multipleChoice",
@@ -94,12 +90,8 @@ export const MOCK_WORKBOOK: Workbook = {
 								"Mia read the book alone on Sunday morning, before her grandmother arrived.",
 						},
 					],
-					canonicalExplanation:
-						"Filter for actions where *both* Mia and her grandmother are the actors — only the cake-making fits.",
 				},
 			],
-			canonicalExplanation:
-				"This reading checks comprehension of a past-tense narrative. Track time markers ('Last Saturday', 'On Sunday morning', 'In the afternoon') and who does each action.",
 		},
 		{
 			id: 2,
@@ -125,8 +117,6 @@ export const MOCK_WORKBOOK: Workbook = {
 						"'watching' is the -ing form, used with 'be' (I was watching). On its own it can't express past simple.",
 				},
 			],
-			canonicalExplanation:
-				"Past simple of a regular verb: base + -ed. 'Last night' is a time marker that fixes the action in the past.",
 		},
 		{
 			id: 3,
@@ -138,8 +128,6 @@ export const MOCK_WORKBOOK: Workbook = {
 				"'goed' isn't a real English form. 'Go' is irregular — the past simple is 'went'.",
 			explanationIfFalseChosen:
 				"Correct! 'Go' is irregular, so the past simple is 'went', not 'goed'.",
-			canonicalExplanation:
-				"'Go' is one of the most common irregular verbs. Its past simple is 'went' — the -ed rule does not apply.",
 		},
 		{
 			id: 4,
@@ -161,8 +149,6 @@ export const MOCK_WORKBOOK: Workbook = {
 						"'Eat' is irregular: past simple is 'ate' (not 'eated').",
 				},
 			],
-			canonicalExplanation:
-				"Two past-simple verbs in one sentence: 'watch' is regular (+ -ed), 'eat' is irregular ('ate'). 'On Friday night' anchors both actions in the past.",
 		},
 		{
 			id: 5,
@@ -172,15 +158,42 @@ export const MOCK_WORKBOOK: Workbook = {
 			leftLabel: "Base form",
 			rightLabel: "Past simple",
 			pairs: [
-				{ left: "go", right: "went" },
-				{ left: "have", right: "had" },
-				{ left: "do", right: "did" },
-				{ left: "see", right: "saw" },
-				{ left: "buy", right: "bought" },
-				{ left: "take", right: "took" },
+				{
+					left: "go",
+					right: "went",
+					explanation: "'Go' is irregular; its past simple is 'went' — no -ed.",
+				},
+				{
+					left: "have",
+					right: "had",
+					explanation:
+						"'Have' is irregular; the past simple is 'had' (also used with any subject — no 'haved').",
+				},
+				{
+					left: "do",
+					right: "did",
+					explanation:
+						"'Do' is irregular; 'did' is both the past simple and the auxiliary for questions and negatives.",
+				},
+				{
+					left: "see",
+					right: "saw",
+					explanation:
+						"'See' is irregular; the past simple is 'saw'. Don't confuse it with the past participle 'seen'.",
+				},
+				{
+					left: "buy",
+					right: "bought",
+					explanation:
+						"'Buy' is irregular; the past simple is 'bought' (same form as the past participle).",
+				},
+				{
+					left: "take",
+					right: "took",
+					explanation:
+						"'Take' is irregular; 'took' is the past simple ('taken' is the past participle).",
+				},
 			],
-			canonicalExplanation:
-				"High-frequency irregular past forms to memorise: go/went, have/had, do/did, see/saw, buy/bought, take/took.",
 		},
 		{
 			id: 6,
@@ -212,8 +225,6 @@ export const MOCK_WORKBOOK: Workbook = {
 						"English doesn't invert the main verb to form questions — you need the auxiliary 'did': 'Did you go…?'",
 				},
 			],
-			canonicalExplanation:
-				"Past simple questions are formed with 'did' + subject + base verb. The auxiliary 'did' carries the tense; the main verb stays in its base form.",
 		},
 		{
 			id: 7,
@@ -227,8 +238,6 @@ export const MOCK_WORKBOOK: Workbook = {
 						"The past simple of 'wake up' is 'woke up'. 'Last Saturday morning' signals the past.",
 				},
 			],
-			canonicalExplanation:
-				"'Wake' is irregular: past simple 'woke'. In a phrasal verb like 'wake up', only the main verb changes — the particle stays.",
 		},
 		{
 			id: 8,
@@ -240,8 +249,6 @@ export const MOCK_WORKBOOK: Workbook = {
 				"'buy' is irregular — there's no 'buyed' in English. The past simple is 'bought'.",
 			explanationIfFalseChosen:
 				"Correct! 'Buy' is irregular: the past simple is 'bought'.",
-			canonicalExplanation:
-				"'Buy' is irregular: past simple 'bought'. The regular -ed ending doesn't apply to every verb.",
 		},
 	],
 	suggestions: [

@@ -4,7 +4,6 @@ import { ExerciseCard } from "./ExerciseCard";
 import { ExplanationPanel } from "./ExplanationPanel";
 import type { ReportScore } from "./exercise-reveal";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
-import { StatusPill } from "./StatusPill";
 
 type MultipleChoiceExercise = Extract<Exercise, { kind: "multipleChoice" }>;
 
@@ -22,29 +21,55 @@ export function MultipleChoiceBlock({
 	const [answer, setAnswer] = useState<string | null>(null);
 	const selected = exercise.options.find((o) => o.text === answer);
 	const correct = selected?.isCorrect ? 1 : 0;
+	const correctText = exercise.options.find((o) => o.isCorrect)?.text ?? null;
+	const displayedAnswer = revealed ? correctText : answer;
 
 	useEffect(() => {
 		onScoreChange?.(exercise.id, { correct, total: 1 });
 	}, [exercise.id, correct, onScoreChange]);
 
 	return (
-		<ExerciseCard
-			id={exercise.id}
-			kind={exercise.kind}
-			headerRight={<StatusPill answered={answer !== null} />}
-		>
+		<ExerciseCard id={exercise.id} kind={exercise.kind}>
 			<div className="space-y-5">
 				<p className="exercise-focal">{exercise.prompt}</p>
 				<MultipleChoiceOptions
 					name={`mc-${exercise.id}`}
 					options={exercise.options}
-					selected={answer}
+					selected={displayedAnswer}
 					onSelect={setAnswer}
 					revealCorrect={revealed}
+					disabled={revealed}
 				/>
 			</div>
 			{revealed ? (
-				<ExplanationPanel>{exercise.canonicalExplanation}</ExplanationPanel>
+				<ExplanationPanel>
+					<ol className="space-y-3">
+						{exercise.options.map((opt, i) => {
+							const letter = String.fromCharCode(65 + i);
+							return (
+								<li key={opt.text} className="space-y-1">
+									<p className="text-sm">
+										<span className="mr-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+											{letter}
+										</span>
+										<span
+											className={
+												opt.isCorrect
+													? "font-medium text-emerald-700 dark:text-emerald-400"
+													: ""
+											}
+										>
+											{opt.text}
+										</span>
+									</p>
+									<p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+										{opt.explanationIfChosen}
+									</p>
+								</li>
+							);
+						})}
+					</ol>
+				</ExplanationPanel>
 			) : null}
 		</ExerciseCard>
 	);
