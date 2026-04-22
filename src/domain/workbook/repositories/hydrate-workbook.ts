@@ -61,16 +61,19 @@ export function hydrateWorkbook(
 	const exercises = body.exercises;
 	const exerciseCount = exercises.length;
 
-	const level: CefrLevel = partialMeta.level ?? input.level ?? DEFAULT_LEVEL;
+	// For constraint fields the teacher explicitly set, teacher input wins
+	// over anything the model returned — protects the UI from showing
+	// "B1" when the teacher asked for "A2", etc.
+	const level: CefrLevel = input.level ?? partialMeta.level ?? DEFAULT_LEVEL;
 	const targetLanguage =
-		partialMeta.targetLanguage ?? input.targetLanguage ?? DEFAULT_LANGUAGE;
+		input.targetLanguage ?? partialMeta.targetLanguage ?? DEFAULT_LANGUAGE;
 	const topic =
 		(partialMeta.topic ?? "").trim() || topicFromPrompt(input.prompt);
 	const skillFocus: SkillFocus = partialMeta.skillFocus ?? DEFAULT_SKILL_FOCUS;
 	const ageGroup: AgeGroup = partialMeta.ageGroup ?? DEFAULT_AGE_GROUP;
 	const durationMinutes = clampDuration(
-		partialMeta.durationMinutes ??
-			input.durationMinutes ??
+		input.durationMinutes ??
+			partialMeta.durationMinutes ??
 			Math.max(15, exerciseCount * MINUTES_PER_EXERCISE),
 	);
 
@@ -84,15 +87,20 @@ export function hydrateWorkbook(
 		ageGroup,
 		ageLabel: partialMeta.ageLabel ?? AGE_LABEL[ageGroup],
 		durationMinutes,
-		exerciseCount: partialMeta.exerciseCount ?? exerciseCount,
+		// Always derived from the actual array — model-reported counts are
+		// unreliable (it can claim 10 while returning 8).
+		exerciseCount,
 	};
 
 	const title = (body.title ?? "").trim() || topic;
 	const eyebrow =
 		(body.eyebrow ?? "").trim() || `${topic} · ${level} ${targetLanguage}`;
 	const intro = (body.intro ?? "").trim() || defaultIntro(topic);
+	// Schema requires 2–4 objectives; fall back to two generic defaults so
+	// a hydrated workbook always round-trips through safeParse.
 	const objectives = nonEmpty(body.objectives) ?? [
 		`practise ${topic.toLowerCase()}`,
+		`build confidence with ${topic.toLowerCase()} in everyday use`,
 	];
 
 	return {

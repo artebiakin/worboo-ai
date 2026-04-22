@@ -1,6 +1,6 @@
 import { MockLanguageModelV3 } from "ai/test";
 import { describe, expect, it } from "vitest";
-import { MOCK_WORKBOOK } from "#/presentation/chat/components/mock-workbook";
+import { MOCK_WORKBOOK } from "../__fixtures__/mock-workbook";
 import { generateWorkbookWithModel } from "./generate-workbook-with-model";
 
 const FULL_RESPONSE = {
