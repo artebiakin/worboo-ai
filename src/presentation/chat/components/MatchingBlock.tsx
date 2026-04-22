@@ -2,7 +2,6 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Exercise } from "#/domain/workbook";
 import { ExerciseCard } from "./ExerciseCard";
-import { ExplanationPanel } from "./ExplanationPanel";
 import type { ReportScore } from "./exercise-reveal";
 
 type MatchingExercise = Extract<Exercise, { kind: "matching" }>;
@@ -44,7 +43,7 @@ export function MatchingBlock({
 		<ExerciseCard
 			id={exercise.id}
 			kind={exercise.kind}
-			instructions={exercise.instructions}
+			instructions={exercise.prompt}
 		>
 			<div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:gap-x-10">
 				<p className="exercise-label border-b border-zinc-950/10 pb-2 dark:border-white/10">
@@ -99,26 +98,6 @@ export function MatchingBlock({
 					);
 				})}
 			</div>
-			{revealed ? (
-				<ExplanationPanel>
-					<ol className="space-y-3">
-						{exercise.pairs.map((pair) => (
-							<li key={pair.left} className="space-y-1">
-								<div className="flex flex-wrap items-center gap-2 text-sm">
-									<span>{pair.left}</span>
-									<ArrowRight className="size-3.5 text-zinc-400 dark:text-zinc-500" />
-									<span className="font-medium text-emerald-700 dark:text-emerald-400">
-										{pair.right}
-									</span>
-								</div>
-								<p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-									{pair.explanation}
-								</p>
-							</li>
-						))}
-					</ol>
-				</ExplanationPanel>
-			) : null}
 		</ExerciseCard>
 	);
 }

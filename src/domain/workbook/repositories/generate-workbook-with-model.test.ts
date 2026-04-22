@@ -3,6 +3,22 @@ import { describe, expect, it } from "vitest";
 import { MOCK_WORKBOOK } from "#/presentation/chat/components/mock-workbook";
 import { generateWorkbookWithModel } from "./generate-workbook-with-model";
 
+const FULL_RESPONSE = {
+	type: "workbook",
+	workbook: MOCK_WORKBOOK,
+	suggestions: ["levelUp", "moreExercises"],
+	reasoning: {
+		detectedLanguage: "English",
+		detectedLevel: "A2",
+		chosenTopic: "Weekend Activities",
+		chosenSkillFocus: "grammar",
+		chosenAgeGroup: "teenagers",
+		chosenDurationMinutes: 30,
+		chosenExerciseCounts: { multipleChoice: 3 },
+		chosenDifficultyDistribution: "progressive",
+	},
+};
+
 function makeMockModel(responseObject: unknown) {
 	return new MockLanguageModelV3({
 		doGenerate: async () => ({
@@ -23,19 +39,24 @@ function makeMockModel(responseObject: unknown) {
 }
 
 describe("generateWorkbookWithModel", () => {
-	it("returns a Workbook parsed against the schema", async () => {
-		const model = makeMockModel(MOCK_WORKBOOK);
-		const workbook = await generateWorkbookWithModel(model, {
+	it("returns a workbook result parsed against the schema", async () => {
+		const model = makeMockModel(FULL_RESPONSE);
+		const result = await generateWorkbookWithModel(model, {
 			prompt: "English past simple for A2 teens",
 			level: "A2",
 		});
-		expect(workbook.topic).toBe(MOCK_WORKBOOK.topic);
-		expect(workbook.level).toBe("A2");
-		expect(workbook.exercises).toHaveLength(MOCK_WORKBOOK.exercises.length);
+		if (result.type !== "workbook") {
+			throw new Error(`expected workbook, got ${result.type}`);
+		}
+		expect(result.workbook.title).toBe(MOCK_WORKBOOK.title);
+		expect(result.workbook.meta.level).toBe("A2");
+		expect(result.workbook.exercises).toHaveLength(
+			MOCK_WORKBOOK.exercises.length,
+		);
 	});
 
 	it("passes the system + user prompt to the model", async () => {
-		const model = makeMockModel(MOCK_WORKBOOK);
+		const model = makeMockModel(FULL_RESPONSE);
 		await generateWorkbookWithModel(model, {
 			prompt: "SENTINEL-PROMPT-TEXT",
 			level: "B1",
@@ -51,10 +72,35 @@ describe("generateWorkbookWithModel", () => {
 		expect(flattened).toContain("Worboo");
 	});
 
-	it("rejects a model response that does not match the Workbook schema", async () => {
-		const model = makeMockModel({ topic: "oops" }); // missing most fields
+	it("rejects a model response that does not match the schema at all", async () => {
+		const model = makeMockModel({ gibberish: true });
 		await expect(
 			generateWorkbookWithModel(model, { prompt: "anything" }),
 		).rejects.toThrow();
+	});
+
+	it("returns a questions result when the model asks for clarification", async () => {
+		const model = makeMockModel({
+			type: "questions",
+			questions: [
+				{
+					kind: "required",
+					text: "What level are your students?",
+					options: [
+						{ label: "A2", value: "A2" },
+						{ label: "B1", value: "B1" },
+					],
+					skippable: false,
+				},
+			],
+		});
+		const result = await generateWorkbookWithModel(model, {
+			prompt: "anything",
+		});
+		if (result.type !== "questions") {
+			throw new Error(`expected questions, got ${result.type}`);
+		}
+		expect(result.questions).toHaveLength(1);
+		expect(result.questions[0]?.text).toBe("What level are your students?");
 	});
 });

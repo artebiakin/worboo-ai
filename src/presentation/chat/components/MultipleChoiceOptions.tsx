@@ -20,8 +20,7 @@ export function MultipleChoiceOptions({
 }: MultipleChoiceOptionsProps) {
 	return (
 		<ul className="space-y-2">
-			{options.map((opt, i) => {
-				const letter = String.fromCharCode(65 + i);
+			{options.map((opt) => {
 				const isSelected = selected === opt.text;
 				const showCorrect = revealCorrect && opt.isCorrect;
 				return (
@@ -38,7 +37,7 @@ export function MultipleChoiceOptions({
 								onChange={() => onSelect(opt.text)}
 							/>
 							<span className="mt-0.5 w-4 text-xs font-medium text-zinc-400 dark:text-zinc-500">
-								{letter}
+								{opt.label}
 							</span>
 							<span className="min-w-0 flex-1">{opt.text}</span>
 						</label>

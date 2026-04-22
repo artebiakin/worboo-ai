@@ -9,7 +9,7 @@ export function workbookToHtml(workbook: Workbook): string {
 	const title = esc(workbook.title);
 	const body = renderBody(workbook);
 	const script = `(${workbookInit.toString()})(document);`;
-	const lang = languageCode(workbook.targetLanguage);
+	const lang = languageCode(workbook.meta.targetLanguage);
 	const htmlOpen = lang ? `<html lang="${lang}">` : "<html>";
 	return `<!DOCTYPE html>
 ${htmlOpen}
@@ -193,9 +193,9 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 
 export function workbookFilename(workbook: Workbook): string {
 	const parts = [
-		slugify(workbook.targetLanguage),
-		slugify(workbook.topic),
-		slugify(workbook.level),
+		slugify(workbook.meta.targetLanguage),
+		slugify(workbook.meta.topic),
+		slugify(workbook.meta.level),
 		slugify(workbook.title),
 	].filter((p) => p.length > 0);
 	const name = parts.join("-") || "workbook";
@@ -203,10 +203,11 @@ export function workbookFilename(workbook: Workbook): string {
 }
 
 function renderBody(workbook: Workbook): string {
-	const metadata = `${esc(workbook.topic)} · ${esc(workbook.level)} ${esc(workbook.targetLanguage)}`;
-	const tags = workbook.tags.map((tag) => `<li>${esc(tag)}</li>`).join("");
 	const objectives = workbook.objectives
 		.map((objective) => `<li>${esc(objective)}</li>`)
+		.join("");
+	const tags = buildTags(workbook)
+		.map((tag) => `<li>${esc(tag)}</li>`)
 		.join("");
 	const exercises = workbook.exercises
 		.map((exercise, index) => renderExercise(exercise, index))
@@ -219,7 +220,7 @@ function renderBody(workbook: Workbook): string {
       <span data-score-correct>0</span> / <span data-score-total>0</span>
     </span>
   </div>
-  <p class="wb-meta">${metadata}</p>
+  <p class="wb-meta">${esc(workbook.eyebrow)}</p>
   <h1 class="wb-title">${esc(workbook.title)}</h1>
   ${tags ? `<ul class="wb-tags">${tags}</ul>` : ""}
 </header>
@@ -240,18 +241,28 @@ ${exercises}
 </div>`;
 }
 
+function buildTags(workbook: Workbook): string[] {
+	const { meta } = workbook;
+	return [
+		`${meta.level} · ${meta.levelLabel}`,
+		`${meta.exerciseCount} ${meta.exerciseCount === 1 ? "exercise" : "exercises"}`,
+		`≈ ${meta.durationMinutes} minutes`,
+		meta.ageLabel,
+	];
+}
+
 function renderExercise(exercise: Exercise, index: number): string {
 	const number = index + 1;
 	const kindLabel = EXERCISE_KIND_LABEL[exercise.kind];
 	const header = `<header class="ex-header">
     <span class="ex-kind">Exercise ${number} · ${esc(kindLabel)}</span>
     ${exercise.title ? `<h2 class="ex-title">${esc(exercise.title)}</h2>` : ""}
-    ${exercise.instructions ? `<p class="ex-instructions">${esc(exercise.instructions)}</p>` : ""}
+    ${exercise.prompt ? `<p class="ex-instructions">${esc(exercise.prompt)}</p>` : ""}
   </header>`;
 
 	const body = renderExerciseBody(exercise);
 
-	return `<section class="wb-card ex" data-exercise-id="${exercise.id}">
+	return `<section class="wb-card ex" data-exercise-id="${esc(String(exercise.id))}">
   ${header}
   ${body}
 </section>`;
@@ -279,24 +290,32 @@ function renderExerciseBody(exercise: Exercise): string {
 function renderReading(
 	exercise: Extract<Exercise, { kind: "reading" }>,
 ): string {
-	const paragraphs = exercise.text
+	const paragraphs = exercise.passage.text
 		.split(/\n\s*\n/)
 		.filter((p) => p.trim().length > 0)
 		.map((p) => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`)
 		.join("");
 
+	const passageTitle = exercise.passage.title
+		? `<h3 class="ex-passage-title">${esc(exercise.passage.title)}</h3>`
+		: "";
+
 	const questions = exercise.questions
-		.map((question, i) => {
-			const qId = `${exercise.id}-${i}`;
+		.map((question) => {
 			if (question.kind === "multipleChoice") {
-				return renderMcQuestion(qId, question.prompt, question.options);
+				return renderMcQuestion(question.id, question.prompt, question.options);
 			}
-			return renderTfQuestion(qId, question.statement, question);
+			return renderTfQuestion(
+				question.id,
+				question.prompt,
+				question.statement,
+				question,
+			);
 		})
 		.join("");
 
 	return `<div class="ex-reading">
-    <div class="ex-text">${paragraphs}</div>
+    <div class="ex-text">${passageTitle}${paragraphs}</div>
     <div class="ex-reading-questions">${questions}</div>
   </div>`;
 }
@@ -314,7 +333,12 @@ function renderMultipleChoice(
 function renderTrueFalse(
 	exercise: Extract<Exercise, { kind: "trueFalse" }>,
 ): string {
-	return renderTfQuestion(String(exercise.id), exercise.statement, exercise);
+	return renderTfQuestion(
+		String(exercise.id),
+		exercise.prompt,
+		exercise.statement,
+		exercise,
+	);
 }
 
 function renderMcQuestion(
@@ -322,14 +346,14 @@ function renderMcQuestion(
 	prompt: string,
 	options: Extract<Exercise, { kind: "multipleChoice" }>["options"],
 ): string {
-	const name = `q-${qId}`;
+	const name = `q-${esc(qId)}`;
 	const correctIndex = options.findIndex((o) => o.isCorrect);
 	const optionItems = options
 		.map((option, i) => {
 			const id = `${name}-${i}`;
 			return `<label class="opt" for="${id}">
       <input type="radio" id="${id}" name="${name}" value="${i}"${option.isCorrect ? ' data-correct="1"' : ""}>
-      <span class="opt-letter">${String.fromCharCode(65 + i)}</span>
+      <span class="opt-letter">${esc(option.label)}</span>
       <span class="opt-body">
         <span class="opt-text">${esc(option.text)}</span>
       </span>
@@ -356,15 +380,18 @@ function renderMcQuestion(
 
 function renderTfQuestion(
 	qId: string,
+	prompt: string,
 	statement: string,
 	answer: TrueFalseAnswer,
 ): string {
-	const name = `q-${qId}`;
+	const name = `q-${esc(qId)}`;
 	const correct = answer.correctAnswer ? "true" : "false";
 	const trueExp = esc(answer.explanationIfTrueChosen);
 	const falseExp = esc(answer.explanationIfFalseChosen);
+	const promptLine = prompt ? `<p class="ex-tf-prompt">${esc(prompt)}</p>` : "";
 
 	return `<fieldset class="ex-tf" data-q="${name}" data-q-kind="tf" data-correct="${correct}">
+    ${promptLine}
     <legend class="ex-focal">${esc(statement)}</legend>
     <div class="tf-options">
       <label class="opt opt-tf" for="${name}-t">
@@ -453,27 +480,12 @@ function renderMatching(
 		})
 		.join("");
 
-	const explanations = exercise.pairs
-		.map(
-			(pair) => `<li>
-      <p class="match-exp-head">${esc(pair.left)} &rarr; <span class="match-exp-right">${esc(pair.right)}</span></p>
-      <p class="match-exp-body">${esc(pair.explanation)}</p>
-    </li>`,
-		)
-		.join("");
-
 	return `<div class="ex-match">
     <div class="match-head">
       <span>${esc(exercise.leftLabel)}</span>
       <span>${esc(exercise.rightLabel)}</span>
     </div>
     ${rows}
-    <details class="exp" data-exp-for="ex-${exercise.id}" hidden>
-      <summary class="exp-toggle">Show explanation</summary>
-      <div class="exp-body">
-        <ol class="match-exp-list">${explanations}</ol>
-      </div>
-    </details>
   </div>`;
 }
 
@@ -557,7 +569,7 @@ function slugify(value: string): string {
 	return value
 		.toLowerCase()
 		.normalize("NFKD")
-		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[̀-ͯ]/g, "")
 		.replace(/[^a-z0-9]+/g, "-")
 		.replace(/^-+|-+$/g, "")
 		.slice(0, 80);
@@ -613,6 +625,8 @@ body { margin: 0; }
 .ex-title { margin: 6px 0 0; font-size: 18px; font-weight: 700; color: #09090b; }
 .ex-instructions { margin: 4px 0 0; font-size: 14px; color: #52525b; }
 .ex-focal { font-size: 16px; font-weight: 500; color: #18181b; line-height: 1.55; margin: 0 0 12px; }
+.ex-tf-prompt { margin: 0 0 8px; font-size: 13px; color: #71717a; letter-spacing: 0.03em; }
+.ex-passage-title { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #09090b; letter-spacing: 0.02em; }
 
 /* Multiple choice / True-false */
 .ex-mc, .ex-tf { border: none; padding: 0; margin: 0; }
@@ -743,12 +757,11 @@ body { margin: 0; }
   line-height: 1.6;
   color: #3f3f46;
 }
-.fb-exp-list, .match-exp-list { margin: 0; padding-left: 20px; }
-.fb-exp-list li, .match-exp-list li { margin: 6px 0; }
-.fb-exp-head, .match-exp-head { margin: 0; font-size: 13px; }
+.fb-exp-list { margin: 0; padding-left: 20px; }
+.fb-exp-list li { margin: 6px 0; }
+.fb-exp-head { margin: 0; font-size: 13px; }
 .fb-exp-label { color: #71717a; font-weight: 500; }
-.fb-exp-body, .match-exp-body { margin: 2px 0 0; font-size: 12px; color: #71717a; line-height: 1.6; }
-.match-exp-right { color: #047857; font-weight: 600; }
+.fb-exp-body { margin: 2px 0 0; font-size: 12px; color: #71717a; line-height: 1.6; }
 
 .opt[data-state="correct"] input[type="radio"] { accent-color: #10b981; }
 .opt[data-state="incorrect"] input[type="radio"] { accent-color: #f43f5e; }
@@ -787,10 +800,9 @@ body { margin: 0; }
 @media (prefers-color-scheme: dark) {
   :host, body { background: #09090b; color: #fafafa; }
   .wb-card, .wb-header { background: #18181b; border-color: rgba(255,255,255,0.1); }
-  .wb-title, .ex-title, .match-left, .fb input[type="text"], .ex-text { color: #fafafa; }
-  .wb-meta, .ex-kind, .wb-label, .match-head, .match-num, .fb-hint, .opt-letter { color: #a1a1aa; }
-  .wb-focal, .ex-focal, .ex-instructions, .wb-objectives li, .fb-exp-body, .match-exp-body, .opt-exp { color: #d4d4d8; }
-  .match-exp-right { color: #6ee7b7; }
+  .wb-title, .ex-title, .match-left, .fb input[type="text"], .ex-text, .ex-passage-title { color: #fafafa; }
+  .wb-meta, .ex-kind, .wb-label, .match-head, .match-num, .fb-hint, .opt-letter, .ex-tf-prompt { color: #a1a1aa; }
+  .wb-focal, .ex-focal, .ex-instructions, .wb-objectives li, .fb-exp-body, .opt-exp { color: #d4d4d8; }
   .wb-tags li { background: #27272a; border-color: rgba(255,255,255,0.1); color: #a1a1aa; }
   .wb-badge { background: rgba(255,255,255,0.06); color: #a1a1aa; }
   .opt { background: #18181b; border-color: rgba(255,255,255,0.1); color: #d4d4d8; }

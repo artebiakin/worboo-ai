@@ -8,23 +8,36 @@ export {
 export type {
 	AgeGroup,
 	CefrLevel,
+	ClarificationOption,
+	ClarificationQuestion,
+	ClarificationQuestionKind,
 	DifficultyDistribution,
 	Exercise,
 	FillBlank,
 	MatchingPair,
 	MultipleChoiceOption,
-	ReadingQuestion,
+	ReadingPassage,
+	ReadingSubQuestion,
 	SkillFocus,
+	SuggestionId,
 	TrueFalseAnswer,
 	Workbook,
+	WorkbookMeta,
 	WorkbookReasoning,
 } from "./models/Workbook";
 export { FILL_BLANK_PLACEHOLDER } from "./models/Workbook";
-export { workbookSchema } from "./models/workbook-schema";
+export {
+	workbookResponseSchema,
+	workbookSchema,
+} from "./models/workbook-schema";
 export {
 	buildSystemPrompt,
 	buildUserPrompt,
 	type GenerateWorkbookInput,
 } from "./prompts/workbook-generation";
 export { generateWorkbook } from "./repositories/generate-workbook";
-export { generateWorkbookWithModel } from "./repositories/generate-workbook-with-model";
+export {
+	type GenerateWorkbookResult,
+	generateWorkbookWithModel,
+} from "./repositories/generate-workbook-with-model";
+export { hydrateWorkbook } from "./repositories/hydrate-workbook";

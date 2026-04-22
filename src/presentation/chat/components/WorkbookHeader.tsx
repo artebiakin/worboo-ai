@@ -19,14 +19,14 @@ export function WorkbookHeader({ workbook, score }: WorkbookHeaderProps) {
 			)}
 			<div>
 				<p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-					{workbook.topic} · {workbook.level} {workbook.targetLanguage}
+					{workbook.eyebrow}
 				</p>
 				<h1 className="mt-1 font-display text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
 					{workbook.title}
 				</h1>
 			</div>
 			<ul className="flex flex-wrap justify-center gap-2">
-				{workbook.tags.map((tag) => (
+				{buildTags(workbook).map((tag) => (
 					<li
 						key={tag}
 						className="rounded-md border border-zinc-950/10 bg-zinc-50 px-2.5 py-1 text-xs text-zinc-600 dark:border-white/10 dark:bg-zinc-800 dark:text-zinc-400"
@@ -37,6 +37,16 @@ export function WorkbookHeader({ workbook, score }: WorkbookHeaderProps) {
 			</ul>
 		</div>
 	);
+}
+
+function buildTags(workbook: Workbook): string[] {
+	const { meta } = workbook;
+	return [
+		`${meta.level} · ${meta.levelLabel}`,
+		`${meta.exerciseCount} ${meta.exerciseCount === 1 ? "exercise" : "exercises"}`,
+		`≈ ${meta.durationMinutes} minutes`,
+		meta.ageLabel,
+	];
 }
 
 function scoreTone(correct: number, total: number) {
