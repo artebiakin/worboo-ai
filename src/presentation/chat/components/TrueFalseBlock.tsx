@@ -59,7 +59,7 @@ export function TrueFalseBlock({
 			</div>
 			{revealed ? (
 				<ExplanationPanel>
-					<dl className="space-y-2">
+					<dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
 						<ChoiceLine
 							label="If True"
 							isCorrect={exercise.correctAnswer === true}
@@ -70,6 +70,9 @@ export function TrueFalseBlock({
 							isCorrect={exercise.correctAnswer === false}
 							text={exercise.explanationIfFalseChosen}
 						/>
+						{exercise.correctAnswer === false ? (
+							<ChoiceLine label="Correction" text={exercise.correction} />
+						) : null}
 					</dl>
 				</ExplanationPanel>
 			) : null}
@@ -95,10 +98,10 @@ function TrueFalseOption({
 	return (
 		<button
 			type="button"
-			onClick={disabled ? undefined : onClick}
+			onClick={onClick}
 			aria-pressed={selected}
-			aria-disabled={disabled}
-			className={`flex items-center justify-center gap-2 rounded-lg border px-5 py-4 text-base font-medium focus-visible:outline-none ${optionCardStyle(selected, isCorrect)} ${disabled ? "pointer-events-none" : ""}`}
+			disabled={disabled}
+			className={`flex items-center justify-center gap-2 rounded-lg border px-5 py-4 text-base font-medium focus-visible:outline-none disabled:cursor-default disabled:opacity-100 ${optionCardStyle(selected, isCorrect)}`}
 		>
 			{icon}
 			{label}
@@ -116,9 +119,9 @@ function ChoiceLine({
 	text: string;
 }) {
 	return (
-		<div className="flex gap-3">
+		<>
 			<dt
-				className={`shrink-0 text-xs font-medium ${
+				className={`self-start text-xs font-medium ${
 					isCorrect
 						? "text-emerald-700 dark:text-emerald-400"
 						: "text-zinc-500 dark:text-zinc-400"
@@ -126,7 +129,7 @@ function ChoiceLine({
 			>
 				{label}
 			</dt>
-			<dd>{text}</dd>
-		</div>
+			<dd className="m-0">{text}</dd>
+		</>
 	);
 }
