@@ -40,4 +40,3 @@ export {
 	type GenerateWorkbookResult,
 	generateWorkbookWithModel,
 } from "./repositories/generate-workbook-with-model";
-export { hydrateWorkbook } from "./repositories/hydrate-workbook";
