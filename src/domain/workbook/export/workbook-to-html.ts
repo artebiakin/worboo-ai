@@ -9,8 +9,10 @@ export function workbookToHtml(workbook: Workbook): string {
 	const title = esc(workbook.title);
 	const body = renderBody(workbook);
 	const script = `(${workbookInit.toString()})(document);`;
+	const lang = languageCode(workbook.targetLanguage);
+	const htmlOpen = lang ? `<html lang="${lang}">` : "<html>";
 	return `<!DOCTYPE html>
-<html>
+${htmlOpen}
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,6 +20,7 @@ export function workbookToHtml(workbook: Workbook): string {
 <style>${STYLES}</style>
 </head>
 <body>
+<noscript><p style="max-width:720px;margin:24px auto;padding:16px;border:1px solid #f43f5e;border-radius:8px;color:#9f1239;background:#fff1f2;font-family:system-ui,sans-serif">Please enable JavaScript to check your answers.</p></noscript>
 <main class="wb">
 ${body}
 </main>
@@ -32,6 +35,11 @@ export function workbookMarkup(workbook: Workbook): string {
 
 export const workbookStyles = (): string => STYLES;
 
+// Serialized via `.toString()` and embedded in the standalone HTML, then also
+// called directly on a ShadowRoot from the in-app preview. Must stay
+// self-contained: no references to outer-module bindings, no closures over
+// module state — everything it needs comes through the `root` argument or is
+// declared inside the function body.
 export function workbookInit(root: Document | ShadowRoot | Element): void {
 	function norm(s: string): string {
 		return (s || "").trim().toLocaleLowerCase();
@@ -91,7 +99,10 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		let accepted: string[] = [];
 		try {
 			accepted = JSON.parse(raw);
-		} catch {}
+		} catch (err) {
+			if (typeof console !== "undefined")
+				console.warn("workbookInit: malformed data-accepted", err);
+		}
 		const input = el.querySelector<HTMLInputElement>("input");
 		const value = norm(input ? input.value : "");
 		const isCorrect =
@@ -156,7 +167,10 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		const wb = root.querySelector<HTMLElement>(".wb");
 		if (wb) {
 			wb.setAttribute("data-revealed", "");
-			if (wb.scrollIntoView)
+			// Only scroll to the top in the standalone HTML. When `workbookInit`
+			// runs against a ShadowRoot inside the preview dialog, scrolling
+			// yanks the dialog's scroll container — bad UX.
+			if (root.nodeType === 9 && wb.scrollIntoView)
 				wb.scrollIntoView({ behavior: "smooth", block: "start" });
 		}
 	}
@@ -314,7 +328,7 @@ function renderMcQuestion(
 	const explanations = options
 		.map(
 			(option, i) =>
-				`<p class="opt-exp" data-option="${i}" hidden>${esc(stripCorrectPrefix(option.explanationIfChosen))}</p>`,
+				`<p class="opt-exp" data-option="${i}" hidden>${esc(option.explanationIfChosen)}</p>`,
 		)
 		.join("");
 
@@ -335,8 +349,8 @@ function renderTfQuestion(
 ): string {
 	const name = `q-${qId}`;
 	const correct = answer.correctAnswer ? "true" : "false";
-	const trueExp = esc(stripCorrectPrefix(answer.explanationIfTrueChosen));
-	const falseExp = esc(stripCorrectPrefix(answer.explanationIfFalseChosen));
+	const trueExp = esc(answer.explanationIfTrueChosen);
+	const falseExp = esc(answer.explanationIfFalseChosen);
 
 	return `<fieldset class="ex-tf" data-q="${name}" data-q-kind="tf" data-correct="${correct}">
     <legend class="ex-focal">${esc(statement)}</legend>
@@ -360,10 +374,6 @@ function renderTfQuestion(
   </fieldset>`;
 }
 
-function stripCorrectPrefix(text: string): string {
-	return text.replace(/^\s*correct[\s!.:—-]+/i, "");
-}
-
 function renderFillBlank(
 	exercise: Extract<Exercise, { kind: "fillBlank" }>,
 ): string {
@@ -373,7 +383,7 @@ function renderFillBlank(
 		html += esc(segment);
 		const blank = exercise.blanks[i];
 		if (blank) {
-			const accepted = attr(JSON.stringify(blank.acceptedAnswers));
+			const accepted = esc(JSON.stringify(blank.acceptedAnswers));
 			html += `<span class="fb" data-q="q-${exercise.id}-${i}" data-q-kind="fb" data-accepted="${accepted}">
         <input type="text" autocomplete="off">
         <span class="fb-hint">(${esc(blank.hint)})</span>
@@ -410,13 +420,13 @@ function renderMatching(
 		String(exercise.id),
 	);
 	const optionsHtml = rightOptions
-		.map((opt) => `<option value="${attr(opt)}">${esc(opt)}</option>`)
+		.map((opt) => `<option value="${esc(opt)}">${esc(opt)}</option>`)
 		.join("");
 
 	const rows = exercise.pairs
 		.map((pair, i) => {
 			const qName = `q-${exercise.id}-${i}`;
-			return `<div class="match-row" data-q="${qName}" data-q-kind="match" data-correct="${attr(pair.right)}">
+			return `<div class="match-row" data-q="${qName}" data-q-kind="match" data-correct="${esc(pair.right)}">
       <div class="match-left">
         <span class="match-num">${pad2(i + 1)}</span>
         <span>${esc(pair.left)}</span>
@@ -472,10 +482,6 @@ function esc(value: string): string {
 		.replace(/'/g, "&#39;");
 }
 
-function attr(value: string): string {
-	return esc(value);
-}
-
 function pad2(n: number): string {
 	return n.toString().padStart(2, "0");
 }
@@ -496,6 +502,45 @@ function fnv1a(s: string): number {
 	return h >>> 0;
 }
 
+const LANGUAGE_CODES: Record<string, string> = {
+	english: "en",
+	spanish: "es",
+	french: "fr",
+	german: "de",
+	italian: "it",
+	portuguese: "pt",
+	russian: "ru",
+	ukrainian: "uk",
+	polish: "pl",
+	dutch: "nl",
+	chinese: "zh",
+	japanese: "ja",
+	korean: "ko",
+	arabic: "ar",
+	hebrew: "he",
+	hindi: "hi",
+	turkish: "tr",
+	swedish: "sv",
+	norwegian: "no",
+	danish: "da",
+	finnish: "fi",
+	greek: "el",
+	czech: "cs",
+	hungarian: "hu",
+	romanian: "ro",
+	bulgarian: "bg",
+	serbian: "sr",
+	croatian: "hr",
+	vietnamese: "vi",
+	thai: "th",
+	indonesian: "id",
+};
+
+function languageCode(name: string): string | null {
+	const key = name.toLowerCase().trim().split(/\s+/)[0] ?? "";
+	return LANGUAGE_CODES[key] ?? null;
+}
+
 function slugify(value: string): string {
 	return value
 		.toLowerCase()
@@ -506,6 +551,10 @@ function slugify(value: string): string {
 		.slice(0, 80);
 }
 
+// Standalone stylesheet for the downloadable HTML. This is a second source
+// of truth alongside the Tailwind v4 tokens in `src/styles.css` — the
+// downloaded file has no Tailwind runtime, so colors must be inlined here.
+// Keep brand colors in rough parity with `@theme` / `.dark` in styles.css.
 const STYLES = `
 *,*::before,*::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -737,6 +786,7 @@ body { margin: 0; }
   .opt:has(input:checked):not([data-state]) { border-color: #a78bfa; background: rgba(167,139,250,0.12); color: #fafafa; }
   .opt[data-state="correct"] { background: rgba(16,185,129,0.15); color: #6ee7b7; }
   .opt[data-state="incorrect"] { background: rgba(244,63,94,0.15); color: #fda4af; }
+  .wb[data-revealed] .opt:hover { background: #18181b; border-color: rgba(255,255,255,0.1); }
   .match-select { background-color: #18181b; color: #fafafa; border-color: rgba(255,255,255,0.12); }
   .ex-text { background: rgba(255,255,255,0.03); }
   #wb-check { background: #fafafa; color: #09090b; }
@@ -746,7 +796,6 @@ body { margin: 0; }
   .exp-toggle:hover { background: rgba(255,255,255,0.04); }
   .exp-toggle::after { border-color: #a1a1aa; }
   .exp-body { border-color: rgba(255,255,255,0.1); color: #d4d4d8; }
-  .match-exp-right { color: #6ee7b7; }
 }
 
 @media (prefers-reduced-motion: reduce) {
