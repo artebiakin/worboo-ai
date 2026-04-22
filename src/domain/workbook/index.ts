@@ -20,3 +20,11 @@ export type {
 	WorkbookReasoning,
 } from "./models/Workbook";
 export { FILL_BLANK_PLACEHOLDER } from "./models/Workbook";
+export { workbookSchema } from "./models/workbook-schema";
+export {
+	buildSystemPrompt,
+	buildUserPrompt,
+	type GenerateWorkbookInput,
+} from "./prompts/workbook-generation";
+export { generateWorkbook } from "./repositories/generate-workbook";
+export { generateWorkbookWithModel } from "./repositories/generate-workbook-with-model";
