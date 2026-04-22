@@ -12,7 +12,6 @@ import {
 	buildUserPrompt,
 	type GenerateWorkbookInput,
 } from "../prompts/workbook-generation";
-import { hydrateWorkbook } from "./hydrate-workbook";
 
 const log = logger.scope("workbook:generate");
 
@@ -86,8 +85,7 @@ export async function generateWorkbookWithModel(
 			);
 		}
 
-		const workbook = hydrateWorkbook({ workbook: response.workbook }, input);
-		return { type: "workbook", workbook };
+		return { type: "workbook", workbook: response.workbook };
 	} catch (err) {
 		if (NoObjectGeneratedError.isInstance(err)) {
 			log.error("model returned shape that did not match workbookSchema", err, {
