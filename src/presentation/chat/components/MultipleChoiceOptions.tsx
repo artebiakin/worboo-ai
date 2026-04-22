@@ -27,15 +27,15 @@ export function MultipleChoiceOptions({
 				return (
 					<li key={opt.text}>
 						<label
-							className={`flex items-start gap-4 rounded-lg border px-5 py-3 ${optionCardStyle(isSelected, showCorrect)} ${disabled ? "pointer-events-none" : ""}`}
+							className={`flex items-start gap-4 rounded-lg border px-5 py-3 ${optionCardStyle(isSelected, showCorrect)}`}
 						>
 							<input
 								type="radio"
 								name={name}
 								className={`mt-1 size-4 ${showCorrect ? "accent-emerald-600" : "accent-violet-600"}`}
 								checked={isSelected}
-								readOnly={disabled}
-								onChange={disabled ? undefined : () => onSelect(opt.text)}
+								disabled={disabled}
+								onChange={() => onSelect(opt.text)}
 							/>
 							<span className="mt-0.5 w-4 text-xs font-medium text-zinc-400 dark:text-zinc-500">
 								{letter}

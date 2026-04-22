@@ -37,7 +37,9 @@ export function WorkbookPreview({ workbook }: WorkbookPreviewProps) {
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
-		URL.revokeObjectURL(url);
+		// Revoke on the next tick — synchronous revoke cancels the download in
+		// some browsers (notably Safari).
+		setTimeout(() => URL.revokeObjectURL(url), 0);
 	}, [workbook]);
 
 	return (

@@ -41,8 +41,10 @@ export const workbookStyles = (): string => STYLES;
 // module state — everything it needs comes through the `root` argument or is
 // declared inside the function body.
 export function workbookInit(root: Document | ShadowRoot | Element): void {
+	// Locale-insensitive: `toLocaleLowerCase()` varies by locale (Turkish i,
+	// for one), which would make grading non-deterministic across devices.
 	function norm(s: string): string {
-		return (s || "").trim().toLocaleLowerCase();
+		return (s || "").trim().toLowerCase();
 	}
 
 	function gradeMc(fs: Element): { correct: number; total: number } {
@@ -56,17 +58,18 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		);
 		const chosen = checked ? parseInt(checked.value, 10) : -1;
 		opts.forEach((opt, i) => {
-			if (i === chosen) {
-				opt.setAttribute(
-					"data-state",
-					i === correctIndex ? "correct" : "incorrect",
-				);
+			const input = opt.querySelector<HTMLInputElement>("input");
+			if (i === correctIndex) {
+				opt.setAttribute("data-state", "correct");
+				if (input) input.checked = true;
+			} else if (i === chosen) {
+				opt.setAttribute("data-state", "incorrect");
 			}
+			if (input) input.disabled = true;
 		});
-		if (chosen !== -1) {
-			const exp = fs.querySelector<HTMLElement>(`[data-option="${chosen}"]`);
-			if (exp) exp.hidden = false;
-		}
+		fs.querySelectorAll<HTMLElement>(".opt-exp").forEach((exp) => {
+			exp.hidden = false;
+		});
 		return { correct: chosen === correctIndex ? 1 : 0, total: 1 };
 	}
 
@@ -80,17 +83,17 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		opts.forEach((opt) => {
 			const input = opt.querySelector<HTMLInputElement>("input");
 			const val = input ? input.value : "";
-			if (val === chosen) {
-				opt.setAttribute(
-					"data-state",
-					val === correct ? "correct" : "incorrect",
-				);
+			if (val === correct) {
+				opt.setAttribute("data-state", "correct");
+				if (input) input.checked = true;
+			} else if (val === chosen) {
+				opt.setAttribute("data-state", "incorrect");
 			}
+			if (input) input.disabled = true;
 		});
-		if (chosen) {
-			const exp = fs.querySelector<HTMLElement>(`[data-option="${chosen}"]`);
-			if (exp) exp.hidden = false;
-		}
+		fs.querySelectorAll<HTMLElement>(".opt-exp").forEach((exp) => {
+			exp.hidden = false;
+		});
 		return { correct: chosen === correct ? 1 : 0, total: 1 };
 	}
 
@@ -108,6 +111,10 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		const isCorrect =
 			value.length > 0 && accepted.map(norm).indexOf(value) !== -1;
 		el.setAttribute("data-state", isCorrect ? "correct" : "incorrect");
+		if (input) {
+			if (!isCorrect && accepted[0]) input.value = accepted[0];
+			input.disabled = true;
+		}
 		return { correct: isCorrect ? 1 : 0, total: 1 };
 	}
 
@@ -117,6 +124,10 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		const value = select ? select.value : "";
 		const isCorrect = value === correct;
 		row.setAttribute("data-state", isCorrect ? "correct" : "incorrect");
+		if (select) {
+			if (!isCorrect && correct) select.value = correct;
+			select.disabled = true;
+		}
 		return { correct: isCorrect ? 1 : 0, total: 1 };
 	}
 
@@ -157,6 +168,7 @@ export function workbookInit(root: Document | ShadowRoot | Element): void {
 		});
 		root.querySelectorAll<HTMLElement>("[data-exp-for]").forEach((el) => {
 			el.hidden = false;
+			if (el instanceof HTMLDetailsElement) el.open = true;
 		});
 		updateBadge(totalCorrect, totalQuestions);
 		const btn = root.querySelector<HTMLButtonElement>("#wb-check");

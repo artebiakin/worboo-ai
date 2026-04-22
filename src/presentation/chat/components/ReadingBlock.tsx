@@ -148,7 +148,7 @@ function QuestionContent({
 
 			{revealed && question.kind === "trueFalse" ? (
 				<ExplanationPanel>
-					<dl className="space-y-2">
+					<dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
 						<ChoiceLine
 							label="If True"
 							isCorrect={question.correctAnswer === true}
@@ -159,6 +159,9 @@ function QuestionContent({
 							isCorrect={question.correctAnswer === false}
 							text={question.explanationIfFalseChosen}
 						/>
+						{question.correctAnswer === false ? (
+							<ChoiceLine label="Correction" text={question.correction} />
+						) : null}
 					</dl>
 				</ExplanationPanel>
 			) : null}
@@ -222,15 +225,15 @@ function TrueFalseOptions({
 				return (
 					<label
 						key={choice}
-						className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected, showCorrect)} ${disabled ? "pointer-events-none" : ""}`}
+						className={`flex items-center gap-3 rounded-lg border px-5 py-4 ${optionCardStyle(isSelected, showCorrect)}`}
 					>
 						<input
 							type="radio"
 							name={name}
 							className={`size-4 ${showCorrect ? "accent-emerald-600" : "accent-violet-600"}`}
 							checked={isSelected}
-							readOnly={disabled}
-							onChange={disabled ? undefined : () => onSelect(choice)}
+							disabled={disabled}
+							onChange={() => onSelect(choice)}
 						/>
 						<span>{choice}</span>
 					</label>
@@ -250,9 +253,9 @@ function ChoiceLine({
 	text: string;
 }) {
 	return (
-		<div className="flex gap-3">
+		<>
 			<dt
-				className={`shrink-0 text-xs font-medium ${
+				className={`self-start text-xs font-medium ${
 					isCorrect
 						? "text-emerald-700 dark:text-emerald-400"
 						: "text-zinc-500 dark:text-zinc-400"
@@ -260,7 +263,7 @@ function ChoiceLine({
 			>
 				{label}
 			</dt>
-			<dd>{text}</dd>
-		</div>
+			<dd className="m-0">{text}</dd>
+		</>
 	);
 }

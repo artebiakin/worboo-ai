@@ -1,6 +1,13 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+
+import { beforeEach, describe, expect, it } from "vitest";
 import type { Exercise, Workbook } from "../models/Workbook";
-import { workbookFilename, workbookToHtml } from "./workbook-to-html";
+import {
+	workbookFilename,
+	workbookInit,
+	workbookMarkup,
+	workbookToHtml,
+} from "./workbook-to-html";
 
 function makeWorkbook(overrides: Partial<Workbook> = {}): Workbook {
 	const base: Workbook = {
@@ -258,5 +265,193 @@ describe("workbookToHtml", () => {
 		const html = workbookToHtml(makeWorkbook({ exercises: [MC_EXERCISE] }));
 		// 'went' is option index 1.
 		expect(html).toMatch(/data-q-kind="mc"[^>]*data-correct-index="1"/);
+	});
+});
+
+function mountWorkbook(workbook: Workbook): HTMLElement {
+	const host = document.createElement("div");
+	host.innerHTML = workbookMarkup(workbook);
+	document.body.appendChild(host);
+	workbookInit(document);
+	return host;
+}
+
+function clickCheck(): void {
+	document.querySelector<HTMLButtonElement>("#wb-check")?.click();
+}
+
+describe("workbookInit reveal behavior", () => {
+	beforeEach(() => {
+		// Fresh body between cases — `workbookInit` wires listeners onto the
+		// buttons rendered in the DOM, and leftover trees would pollute.
+		document.body.innerHTML = "";
+	});
+
+	it("marks the correct MC option as correct and locks all radios", () => {
+		mountWorkbook(makeWorkbook({ exercises: [MC_EXERCISE] }));
+		// Pick the wrong option first.
+		const wrong = document.querySelector<HTMLInputElement>(
+			'input[type="radio"][value="0"]',
+		);
+		expect(wrong).not.toBeNull();
+		if (wrong) wrong.checked = true;
+
+		clickCheck();
+
+		const opts = document.querySelectorAll<HTMLElement>(".opt");
+		expect(opts[0]?.getAttribute("data-state")).toBe("incorrect");
+		expect(opts[1]?.getAttribute("data-state")).toBe("correct");
+		// Correct radio gets checked on reveal even though user picked the wrong one.
+		const correctRadio = document.querySelector<HTMLInputElement>(
+			'input[type="radio"][value="1"]',
+		);
+		expect(correctRadio?.checked).toBe(true);
+		// Every radio is disabled.
+		document
+			.querySelectorAll<HTMLInputElement>('input[type="radio"]')
+			.forEach((r) => {
+				expect(r.disabled).toBe(true);
+			});
+	});
+
+	it("only marks the correct MC option when the user leaves it blank", () => {
+		mountWorkbook(makeWorkbook({ exercises: [MC_EXERCISE] }));
+		clickCheck();
+		const opts = document.querySelectorAll<HTMLElement>(".opt");
+		expect(opts[0]?.getAttribute("data-state")).toBeNull();
+		expect(opts[1]?.getAttribute("data-state")).toBe("correct");
+	});
+
+	it("opens the explanation <details> and unhides every option-exp on reveal", () => {
+		mountWorkbook(makeWorkbook({ exercises: [MC_EXERCISE] }));
+		const details = document.querySelector<HTMLDetailsElement>("details.exp");
+		expect(details?.open).toBe(false);
+		expect(details?.hidden).toBe(true);
+
+		clickCheck();
+
+		expect(details?.hidden).toBe(false);
+		expect(details?.open).toBe(true);
+		document.querySelectorAll<HTMLElement>(".opt-exp").forEach((el) => {
+			expect(el.hidden).toBe(false);
+		});
+	});
+
+	it("marks TF correct option when the user picks wrong", () => {
+		mountWorkbook(makeWorkbook({ exercises: [TF_EXERCISE] }));
+		// TF_EXERCISE.correctAnswer === false; pick "true" (wrong).
+		const trueRadio = document.querySelector<HTMLInputElement>(
+			'input[type="radio"][value="true"]',
+		);
+		if (trueRadio) trueRadio.checked = true;
+
+		clickCheck();
+
+		const [trueOpt, falseOpt] = document.querySelectorAll<HTMLElement>(".opt");
+		expect(trueOpt?.getAttribute("data-state")).toBe("incorrect");
+		expect(falseOpt?.getAttribute("data-state")).toBe("correct");
+		// False radio is now checked.
+		const falseRadio = document.querySelector<HTMLInputElement>(
+			'input[type="radio"][value="false"]',
+		);
+		expect(falseRadio?.checked).toBe(true);
+	});
+
+	it("populates fill-blank input with the first accepted answer when empty", () => {
+		mountWorkbook(
+			makeWorkbook({
+				exercises: [
+					{
+						id: 9,
+						kind: "fillBlank",
+						sentence: "Yesterday I {{blank}} home.",
+						blanks: [
+							{
+								hint: "go",
+								acceptedAnswers: ["went"],
+								explanation: "Past of 'go'.",
+							},
+						],
+					},
+				],
+			}),
+		);
+		clickCheck();
+		const input = document.querySelector<HTMLInputElement>(".fb input");
+		expect(input?.value).toBe("went");
+		expect(input?.disabled).toBe(true);
+		expect(document.querySelector(".fb")?.getAttribute("data-state")).toBe(
+			"incorrect",
+		);
+	});
+
+	it("keeps a correct fill-blank answer as-is and marks it correct", () => {
+		mountWorkbook(
+			makeWorkbook({
+				exercises: [
+					{
+						id: 9,
+						kind: "fillBlank",
+						sentence: "Yesterday I {{blank}} home.",
+						blanks: [
+							{
+								hint: "go",
+								acceptedAnswers: ["went"],
+								explanation: "Past of 'go'.",
+							},
+						],
+					},
+				],
+			}),
+		);
+		const input = document.querySelector<HTMLInputElement>(".fb input");
+		if (input) input.value = "  WENT  "; // whitespace + case-insensitive
+		clickCheck();
+		expect(input?.value.trim().toLowerCase()).toBe("went");
+		expect(document.querySelector(".fb")?.getAttribute("data-state")).toBe(
+			"correct",
+		);
+	});
+
+	it("populates matching select with the correct value on wrong pick", () => {
+		mountWorkbook(
+			makeWorkbook({
+				exercises: [
+					{
+						id: 5,
+						kind: "matching",
+						leftLabel: "Base",
+						rightLabel: "Past",
+						pairs: [
+							{ left: "go", right: "went", explanation: "irregular" },
+							{ left: "have", right: "had", explanation: "irregular" },
+						],
+					},
+				],
+			}),
+		);
+		const [row1, row2] = document.querySelectorAll<HTMLElement>(".match-row");
+		const s1 = row1?.querySelector<HTMLSelectElement>("select");
+		const s2 = row2?.querySelector<HTMLSelectElement>("select");
+		if (s1) s1.value = "had"; // wrong for 'go'
+		// leave s2 blank
+		clickCheck();
+		expect(s1?.value).toBe("went");
+		expect(s2?.value).toBe("had");
+		expect(s1?.disabled).toBe(true);
+		expect(s2?.disabled).toBe(true);
+		expect(row1?.getAttribute("data-state")).toBe("incorrect");
+		expect(row2?.getAttribute("data-state")).toBe("incorrect");
+	});
+
+	it("disables the Check button and tags .wb with data-revealed", () => {
+		mountWorkbook(makeWorkbook({ exercises: [MC_EXERCISE] }));
+		clickCheck();
+		const btn = document.querySelector<HTMLButtonElement>("#wb-check");
+		expect(btn?.disabled).toBe(true);
+		expect(btn?.textContent).toBe("Checked");
+		expect(document.querySelector(".wb")?.hasAttribute("data-revealed")).toBe(
+			true,
+		);
 	});
 });
